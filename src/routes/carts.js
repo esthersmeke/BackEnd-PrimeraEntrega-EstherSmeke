@@ -23,6 +23,9 @@ router.get("/:cid", async (req, res) => {
     const carts = await cartManager.loadCarts(); // Cargar carritos
     const cart = carts.find((c) => c.id === parseInt(cid)); // Convertir cid a número
     if (cart) {
+      if (cart.products.length === 0) {
+        return res.json({ message: "Cart is empty" });
+      }
       res.json(cart.products);
     } else {
       res.status(404).json({ error: "Error: Cart not found." });
@@ -41,6 +44,9 @@ router.post("/:cid/product/:pid", async (req, res) => {
     const cart = updatedCart.find((c) => c.id === parseInt(cid));
     res.status(201).json(cart);
   } catch (error) {
+    if (error.message.includes("Cart not found")) {
+      return res.status(404).json({ error: "Error: Cart not found." });
+    }
     res
       .status(500)
       .json({ error: "Error: Unable to add the product to the cart." });

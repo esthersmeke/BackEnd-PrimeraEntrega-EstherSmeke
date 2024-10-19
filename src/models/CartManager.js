@@ -61,8 +61,6 @@ class CartManager {
 
     await this.saveCarts(); // Guardar los cambios en los carritos
   }
-
-  // Aquí puedes añadir más métodos según sea necesario (por ejemplo, eliminar productos, etc.)
 }
 
 export default CartManager;

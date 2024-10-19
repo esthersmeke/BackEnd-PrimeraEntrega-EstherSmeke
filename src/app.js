@@ -12,10 +12,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Usar los routers para las rutas /api/products y /api/carts
-app.use("/products", productsRouter);
-app.use("/carts", cartsRouter);
+app.use("/api/products", productsRouter);
+app.use("/api/carts", cartsRouter);
 
 // Iniciar el servidor
 app.listen(PORT, () => {
-  console.log(`Server running on port  ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
