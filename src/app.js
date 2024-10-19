@@ -1,4 +1,3 @@
-// src/app.js
 import express from "express";
 import productsRouter from "./routes/products.js"; // Importar el router de productos
 import cartsRouter from "./routes/carts.js"; // Importar el router de carritos
@@ -13,10 +12,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Usar los routers para las rutas /api/products y /api/carts
-app.use("/api/products", productsRouter);
-app.use("/api/carts", cartsRouter);
+app.use("/products", productsRouter);
+app.use("/carts", cartsRouter);
 
 // Iniciar el servidor
 app.listen(PORT, () => {
-  console.log(`Servidor escuchando en el puerto ${PORT}`);
+  console.log(`Server running on port  ${PORT}`);
 });

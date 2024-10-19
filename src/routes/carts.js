@@ -12,7 +12,7 @@ router.post("/", async (req, res) => {
     const newCart = await cartManager.createCart(); // Usar el método createCart
     res.status(201).json(newCart);
   } catch (error) {
-    res.status(500).json({ error: "Error al crear el carrito" });
+    res.status(500).json({ error: "Error: Unable to create the cart." });
   }
 });
 
@@ -25,10 +25,10 @@ router.get("/:cid", async (req, res) => {
     if (cart) {
       res.json(cart.products);
     } else {
-      res.status(404).json({ error: "Carrito no encontrado" });
+      res.status(404).json({ error: "Error: Cart not found." });
     }
   } catch (error) {
-    res.status(500).json({ error: "Error al leer el carrito" });
+    res.status(500).json({ error: "Error: Unable to read the cart." });
   }
 });
 
@@ -41,7 +41,9 @@ router.post("/:cid/product/:pid", async (req, res) => {
     const cart = updatedCart.find((c) => c.id === parseInt(cid));
     res.status(201).json(cart);
   } catch (error) {
-    res.status(500).json({ error: "Error al agregar el producto al carrito" });
+    res
+      .status(500)
+      .json({ error: "Error: Unable to add the product to the cart." });
   }
 });
 

@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
     const products = await productManager.getProducts();
     res.json(limit > 0 ? products.slice(0, limit) : products); // Enviar respuesta
   } catch (error) {
-    res.status(500).json({ error: "Error al obtener los productos" });
+    res.status(500).json({ error: "Error: Unable to retrieve products" });
   }
 });
 
@@ -23,11 +23,14 @@ router.get("/:pid", async (req, res) => {
   const pid = parseInt(req.params.pid); // Convertir a número
   try {
     const product = await productManager.getProductById(pid);
-    res.json(product);
+    res.json(product); // Devolver el producto si se encuentra
   } catch (error) {
-    res
-      .status(error.message === "Not found" ? 404 : 500)
-      .json({ error: error.message });
+    // Manejo del error específico cuando no se encuentra el producto
+    if (error.message === "Not Found") {
+      return res.status(404).json({ error: "Error: Product does not exist." });
+    }
+    // Manejo de otros errores (por ejemplo, problemas de lectura de archivo)
+    res.status(500).json({ error: "Error: Unable to retrieve product" });
   }
 });
 
@@ -48,9 +51,12 @@ router.put("/:pid", async (req, res) => {
     const updatedProduct = await productManager.updateProduct(pid, req.body);
     res.json(updatedProduct);
   } catch (error) {
-    res
-      .status(error.message === "Not found" ? 404 : 500)
-      .json({ error: error.message });
+    // Manejo del error específico cuando no se encuentra el producto
+    if (error.message === "Not Found") {
+      return res.status(404).json({ error: "Error: Product does not exist." });
+    }
+    // Manejo de otros errores (por ejemplo, problemas de lectura de archivo)
+    res.status(500).json({ error: "Error: Unable to update product" });
   }
 });
 
@@ -62,7 +68,7 @@ router.delete("/:pid", async (req, res) => {
     res.status(204).send(); // No se envía contenido
   } catch (error) {
     res
-      .status(error.message === "Not found" ? 404 : 500)
+      .status(error.message === "Not Found" ? 404 : 500)
       .json({ error: error.message });
   }
 });

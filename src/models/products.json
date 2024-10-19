@@ -1,20 +1,112 @@
 [
   {
     "id": 1,
-    "name": "Producto 1 actualizado",
-    "price": 120
+    "title": "Producto Actualizado",
+    "description": "Descripción del producto A",
+    "price": 199.99,
+    "thumbnails": [],
+    "code": "PROD100A",
+    "stock": 50,
+    "category": "Categoría A",
+    "status": true
   },
   {
-    "id": 1728570372764
+    "id": 2,
+    "title": "Producto B",
+    "description": "Descripción del producto B",
+    "price": 110,
+    "thumbnails": [],
+    "code": "PROD100B",
+    "stock": 10,
+    "category": "Categoría A",
+    "status": true
   },
   {
-    "id": 1728570408064,
-    "name": "Nuevo Producto",
-    "price": 150
+    "id": 3,
+    "title": "Producto C",
+    "description": "Descripción del producto C",
+    "price": 120,
+    "thumbnails": [],
+    "code": "PROD100C",
+    "stock": 10,
+    "category": "Categoría B",
+    "status": true
   },
   {
-    "id": 1728571302228,
-    "name": "Nuevo Producto",
-    "price": 250
+    "id": 4,
+    "title": "Producto D",
+    "description": "Descripción del producto D",
+    "price": 120,
+    "thumbnails": [],
+    "code": "PROD100D",
+    "stock": 10,
+    "category": "Categoría B",
+    "status": true
+  },
+  {
+    "id": 5,
+    "title": "Producto E",
+    "description": "Descripción del producto E",
+    "price": 130,
+    "thumbnails": [],
+    "code": "PROD100E",
+    "stock": 10,
+    "category": "Categoría D",
+    "status": true
+  },
+  {
+    "id": 6,
+    "title": "Producto F",
+    "description": "Descripción del producto F",
+    "price": 130,
+    "thumbnails": [],
+    "code": "PROD100F",
+    "stock": 10,
+    "category": "Categoría D",
+    "status": true
+  },
+  {
+    "id": 7,
+    "title": "Producto G",
+    "description": "Descripción del producto G",
+    "price": 130,
+    "thumbnails": [],
+    "code": "PROD100G",
+    "stock": 10,
+    "category": "Categoría E",
+    "status": true
+  },
+  {
+    "id": 8,
+    "title": "Producto H",
+    "description": "Descripción del producto H",
+    "price": 110,
+    "thumbnails": [],
+    "code": "PROD100H",
+    "stock": 10,
+    "category": "Categoría E",
+    "status": true
+  },
+  {
+    "id": 9,
+    "title": "Producto I",
+    "description": "Descripción del producto I",
+    "price": 110,
+    "thumbnails": [],
+    "code": "PROD100I",
+    "stock": 10,
+    "category": "Categoría F",
+    "status": true
+  },
+  {
+    "id": 10,
+    "title": "Producto J",
+    "description": "Descripción del producto J",
+    "price": 100,
+    "thumbnails": [],
+    "code": "PROD100J",
+    "stock": 10,
+    "category": "Categoría F",
+    "status": true
   }
 ]

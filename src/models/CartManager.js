@@ -18,7 +18,7 @@ class CartManager {
         this.nextId = Math.max(...this.carts.map((cart) => cart.id)) + 1;
       }
     } catch (error) {
-      console.error("Error al cargar los carritos:", error);
+      console.error("Error: Unable to load the carts.", error);
       this.carts = []; // Si hay un error, inicializa como un array vacío
     }
     return this.carts;
@@ -29,7 +29,7 @@ class CartManager {
     try {
       await fs.writeFile(this.filePath, JSON.stringify(this.carts, null, 2));
     } catch (error) {
-      console.error("Error al guardar los carritos:", error);
+      console.error("Error: Unable to save the carts.", error);
     }
   }
 
@@ -49,7 +49,7 @@ class CartManager {
     const cart = this.carts.find((c) => c.id === cartId); // Buscar el carrito por ID
 
     if (!cart) {
-      throw new Error("Carrito no encontrado"); // Lanzar error si no se encuentra el carrito
+      throw new Error("Error: Cart not found."); // Lanzar error si no se encuentra el carrito
     }
 
     const productInCart = cart.products.find((p) => p.product === productId); // Buscar el producto en el carrito

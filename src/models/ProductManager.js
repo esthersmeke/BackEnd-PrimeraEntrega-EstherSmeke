@@ -45,16 +45,16 @@ class ProductManager {
       !category
     ) {
       throw new Error(
-        "Todos los campos (excepto thumbnails y status) son obligatorios"
+        "All fields are required except for thumbnails and status."
       );
     }
 
     // Validar que price y stock sean números positivos
     if (typeof price !== "number" || price <= 0) {
-      throw new Error("El precio debe ser un número positivo");
+      throw new Error("The price must be a positive number.");
     }
     if (typeof stock !== "number" || stock < 0) {
-      throw new Error("El stock debe ser un número positivo o cero");
+      throw new Error("The stock must be a positive number or zero.");
     }
 
     // Verificar si el código ya existe
@@ -62,7 +62,7 @@ class ProductManager {
       (product) => product.code === code
     );
     if (existingProduct) {
-      throw new Error("El código del producto ya existe");
+      throw new Error("The product code already exists.");
     }
 
     // Generar un ID autoincrementable
@@ -99,7 +99,7 @@ class ProductManager {
       (product) => product.id === id
     );
     if (productIndex === -1) {
-      throw new Error("Producto no encontrado");
+      throw new Error("Not Found.");
     }
 
     // Actualizar los campos del producto
@@ -115,12 +115,12 @@ class ProductManager {
       (product) => product.id === id
     );
     if (productIndex === -1) {
-      throw new Error("Not found");
+      throw new Error("Not Found");
     }
 
     this.products.splice(productIndex, 1); // Eliminar producto
     await this.saveProducts(); // Guardar cambios en el archivo
-    return { message: "Producto eliminado exitosamente" };
+    return { message: "Product successfully deleted." };
   }
 
   async getProducts() {
@@ -130,7 +130,7 @@ class ProductManager {
   async getProductById(id) {
     const product = this.products.find((product) => product.id === id);
     if (!product) {
-      throw new Error("Not found");
+      throw new Error("Not Found");
     }
     return product;
   }
