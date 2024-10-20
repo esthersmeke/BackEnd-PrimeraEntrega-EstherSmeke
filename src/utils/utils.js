@@ -1,6 +1,6 @@
 // src/utils/utils.js
 import CartManager from "../models/CartManager.js";
-import ProductManager from "../models/ProductManager.js"; // Asegúrate de importar el ProductManager si es necesario
+import ProductManager from "../models/ProductManager.js";
 
 const cartManager = new CartManager("src/models/carts.json");
 const productManager = new ProductManager("src/models/products.json");
@@ -18,7 +18,7 @@ export const validateCartExists = async (cartId) => {
 // Validar que un producto exista
 export const validateProductExists = async (productId) => {
   try {
-    const products = await productManager.loadProducts(); // Asegúrate de que este método exista
+    const products = await productManager.loadProducts();
     return products.some((product) => product.id === parseInt(productId));
   } catch (error) {
     console.error("Error: Unable to validate product existence.", error);

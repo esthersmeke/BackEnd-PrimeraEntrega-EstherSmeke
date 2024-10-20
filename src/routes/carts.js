@@ -1,8 +1,8 @@
 // src/routes/carts.js
 import { Router } from "express";
-import CartManager from "../models/CartManager.js"; // Importar CartManager
+import CartManager from "../models/CartManager.js";
 import path from "path";
-import { validateCartExists, validateProductExists } from "../utils/utils.js"; // Asegúrate de importar estas funciones
+import { validateCartExists, validateProductExists } from "../utils/utils.js";
 
 const router = Router();
 const CARTS_FILE = path.resolve("src/models/carts.json"); // Ruta al archivo de carritos
@@ -33,15 +33,14 @@ router.get("/:cid", async (req, res) => {
 
 // Agregar producto a un carrito
 router.post("/:cid/products/:pid", async (req, res) => {
-  // Cambiar a async aquí
   const cid = parseInt(req.params.cid); // ID del carrito
   const pid = req.params.pid; // ID del producto
   const { quantity } = req.body; // Cantidad de producto
 
   try {
-    // Validar que el carrito y el producto existan antes de continuar
-    const cartExists = await validateCartExists(cid); // Usar await aquí
-    const productExists = await validateProductExists(pid); // Usar await aquí
+    // Validar que el carrito y el producto existan
+    const cartExists = await validateCartExists(cid);
+    const productExists = await validateProductExists(pid);
 
     if (!cartExists) {
       return res.status(404).json({ error: "Cart not found" });

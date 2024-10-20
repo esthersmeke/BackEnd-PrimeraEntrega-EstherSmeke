@@ -44,7 +44,7 @@ class CartManager {
   }
 
   // Método para agregar un producto al carrito
-  async addProductToCart(cartId, productId, quantity) {
+  async addProductToCart(cartId, productId, quantity = 1) {
     await this.loadCarts(); // Cargar carritos desde el archivo
     const cart = this.carts.find((cart) => cart.id === cartId); // Buscar carrito por ID
 

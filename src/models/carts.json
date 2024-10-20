@@ -23,6 +23,26 @@
       {
         "product": "1",
         "quantity": 15
+      },
+      {
+        "product": "4",
+        "quantity": 4
+      },
+      {
+        "product": "5",
+        "quantity": 2
+      },
+      {
+        "product": "8",
+        "quantity": 11
+      },
+      {
+        "product": "2",
+        "quantity": 1
+      },
+      {
+        "product": "9",
+        "quantity": 0
       }
     ]
   }
