@@ -37,6 +37,12 @@ router.post("/:cid/products/:pid", async (req, res) => {
   const pid = req.params.pid; // ID del producto
   const { quantity } = req.body; // Cantidad de producto
 
+  if (!quantity || isNaN(quantity) || quantity <= 0) {
+    return res
+      .status(400)
+      .json({ error: "Invalid quantity. Must be a positive number." });
+  }
+
   try {
     // Validar que el carrito y el producto existan
     const cartExists = await validateCartExists(cid);
