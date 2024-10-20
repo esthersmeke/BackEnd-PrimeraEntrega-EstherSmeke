@@ -1,55 +1,62 @@
 // src/routes/carts.js
 import { Router } from "express";
 import CartManager from "../models/CartManager.js"; // Importar CartManager
+import path from "path";
+import { validateCartExists, validateProductExists } from "../utils/utils.js"; // Asegúrate de importar estas funciones
 
 const router = Router();
-const CARTS_FILE = "src/models/carts.json"; // Ruta de carts.json
-const cartManager = new CartManager(CARTS_FILE); // Instanciar CartManager
+const CARTS_FILE = path.resolve("src/models/carts.json"); // Ruta al archivo de carritos
+const cartManager = new CartManager(CARTS_FILE); // Crear una instancia de CartManager
 
 // Crear un nuevo carrito
 router.post("/", async (req, res) => {
   try {
-    const newCart = await cartManager.createCart(); // Usar el método createCart
-    res.status(201).json(newCart);
+    const newCart = await cartManager.createCart(); // Crear un nuevo carrito
+    res.status(201).json(newCart); // Devolver el nuevo carrito
   } catch (error) {
-    res.status(500).json({ error: "Error: Unable to create the cart." });
+    res.status(500).json({ error: "Error: Unable to create cart" });
   }
 });
 
-// Obtener productos del carrito
+// Obtener carrito por ID
 router.get("/:cid", async (req, res) => {
-  const { cid } = req.params;
+  const cid = parseInt(req.params.cid); // Convertir a número
   try {
-    const carts = await cartManager.loadCarts(); // Cargar carritos
-    const cart = carts.find((c) => c.id === parseInt(cid)); // Convertir cid a número
-    if (cart) {
-      if (cart.products.length === 0) {
-        return res.json({ message: "Cart is empty" });
-      }
-      res.json(cart.products);
-    } else {
-      res.status(404).json({ error: "Error: Cart not found." });
-    }
+    const cart = await cartManager.getCartById(cid);
+    res.json(cart); // Devolver el carrito si se encuentra
   } catch (error) {
-    res.status(500).json({ error: "Error: Unable to read the cart." });
+    res
+      .status(error.message === "Cart not found" ? 404 : 500)
+      .json({ error: error.message });
   }
 });
 
-// Agregar producto al carrito
-router.post("/:cid/product/:pid", async (req, res) => {
-  const { cid, pid } = req.params;
+// Agregar producto a un carrito
+router.post("/:cid/products/:pid", async (req, res) => {
+  // Cambiar a async aquí
+  const cid = parseInt(req.params.cid); // ID del carrito
+  const pid = req.params.pid; // ID del producto
+  const { quantity } = req.body; // Cantidad de producto
+
   try {
-    await cartManager.addProductToCart(parseInt(cid), pid); // Usar el método addProductToCart
-    const updatedCart = await cartManager.loadCarts(); // Cargar carritos para obtener el carrito actualizado
-    const cart = updatedCart.find((c) => c.id === parseInt(cid));
-    res.status(201).json(cart);
-  } catch (error) {
-    if (error.message.includes("Cart not found")) {
-      return res.status(404).json({ error: "Error: Cart not found." });
+    // Validar que el carrito y el producto existan antes de continuar
+    const cartExists = await validateCartExists(cid); // Usar await aquí
+    const productExists = await validateProductExists(pid); // Usar await aquí
+
+    if (!cartExists) {
+      return res.status(404).json({ error: "Cart not found" });
     }
+
+    if (!productExists) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    const updatedCart = await cartManager.addProductToCart(cid, pid, quantity);
+    res.status(200).json(updatedCart); // Devolver el carrito actualizado
+  } catch (error) {
     res
-      .status(500)
-      .json({ error: "Error: Unable to add the product to the cart." });
+      .status(error.message === "Cart not found" ? 404 : 500)
+      .json({ error: error.message });
   }
 });
 

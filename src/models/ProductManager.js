@@ -1,20 +1,20 @@
 import fs from "fs/promises";
 
 class ProductManager {
-  constructor(path) {
-    this.path = path;
+  constructor(filePath) {
+    this.filePath = filePath;
     this.products = [];
-    this.loadProducts(); // Cargar productos en el constructor
   }
 
   async loadProducts() {
     try {
-      const data = await fs.readFile(this.path, "utf-8");
+      const data = await fs.readFile(this.filePath, "utf-8");
       this.products = JSON.parse(data);
     } catch (error) {
+      console.error("Error loading products:", error); // Mostrar error en la consola
       this.products = []; // Si hay un error, comenzamos con un array vacío
-      console.error("Error loading products:", error.message); // Mostrar error en la consola
     }
+    return this.products;
   }
 
   async saveProducts() {

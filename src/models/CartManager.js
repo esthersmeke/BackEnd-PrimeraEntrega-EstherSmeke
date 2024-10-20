@@ -44,22 +44,38 @@ class CartManager {
   }
 
   // Método para agregar un producto al carrito
-  async addProductToCart(cartId, productId) {
-    await this.loadCarts(); // Cargar carritos existentes
-    const cart = this.carts.find((c) => c.id === cartId); // Buscar el carrito por ID
+  async addProductToCart(cartId, productId, quantity) {
+    await this.loadCarts(); // Cargar carritos desde el archivo
+    const cart = this.carts.find((cart) => cart.id === cartId); // Buscar carrito por ID
 
     if (!cart) {
-      throw new Error("Error: Cart not found."); // Lanzar error si no se encuentra el carrito
+      throw new Error("Cart not found"); // Si el carrito no existe
     }
 
-    const productInCart = cart.products.find((p) => p.product === productId); // Buscar el producto en el carrito
-    if (productInCart) {
-      productInCart.quantity += 1; // Incrementar la cantidad si ya existe
+    const existingProduct = cart.products.find((p) => p.product === productId); // Buscar si el producto ya está en el carrito
+
+    if (existingProduct) {
+      // Si el producto ya existe, aumentar la cantidad
+      existingProduct.quantity += quantity;
     } else {
-      cart.products.push({ product: productId, quantity: 1 }); // Agregar nuevo producto si no existe
+      // Si el producto no existe, agregarlo al carrito
+      cart.products.push({ product: productId, quantity });
     }
 
-    await this.saveCarts(); // Guardar los cambios en los carritos
+    await this.saveCarts(); // Guardar los carritos actualizados
+    return cart; // Devolver el carrito actualizado
+  }
+
+  // Obtener todos los productos de un carrito por su ID
+  async getCartById(cartId) {
+    await this.loadCarts(); // Cargar carritos desde el archivo
+    const cart = this.carts.find((cart) => cart.id === cartId); // Buscar carrito por ID
+
+    if (!cart) {
+      throw new Error("Cart not found"); // Si el carrito no existe
+    }
+
+    return cart; // Devolver el carrito encontrado
   }
 }
 
