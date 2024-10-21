@@ -4,6 +4,7 @@ class ProductManager {
   constructor(filePath) {
     this.filePath = filePath;
     this.products = [];
+    this.loadProducts(); // Llamada a la función que carga productos
   }
 
   async loadProducts() {
@@ -19,7 +20,7 @@ class ProductManager {
 
   async saveProducts() {
     try {
-      await fs.writeFile(this.path, JSON.stringify(this.products, null, 2));
+      await fs.writeFile(this.filePath, JSON.stringify(this.products, null, 2));
     } catch (error) {
       console.error("Error saving products:", error.message); // Mostrar error en la consola
     }
