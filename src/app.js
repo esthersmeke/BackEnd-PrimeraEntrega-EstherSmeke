@@ -2,6 +2,8 @@ import express from "express";
 import productsRouter from "./routes/products.js"; // Importar el router de productos
 import cartsRouter from "./routes/carts.js"; // Importar el router de carritos
 import { engine } from "express-handlebars";
+import { Server } from "socket.io";
+import { Socket } from "dgram";
 
 const app = express();
 const PORT = 8080; // Establecer el puerto
@@ -28,6 +30,9 @@ app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
 
 // Iniciar el servidor
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+const io = new Server(server);
+io.on("connection", (Socket) => {});
