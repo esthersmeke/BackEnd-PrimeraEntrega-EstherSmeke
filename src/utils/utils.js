@@ -15,6 +15,7 @@ export const validateCartExists = async (cartId) => {
     return false; // Devuelve false si hay un error
   }
 };
+
 // Validar que un producto exista
 export const validateProductExists = async (productId) => {
   try {

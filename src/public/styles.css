@@ -1,0 +1,19 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+h1 {
+  color: #333;
+}
+ul {
+  list-style-type: none; /* Quitar los puntos de la lista */
+  padding: 0;
+}
+li {
+  border: 1px solid #ccc; /* Bordes para los productos */
+  border-radius: 5px; /* Esquinas redondeadas */
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9; /* Color de fondo para los
+productos */
+}
