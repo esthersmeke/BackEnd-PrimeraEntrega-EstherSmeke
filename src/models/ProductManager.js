@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import { io } from "../app.js"; // Importar io para emitir eventos de websocket
 
 class ProductManager {
   constructor(filePath) {
@@ -85,6 +86,10 @@ class ProductManager {
     // Agregar el nuevo producto al array y guardar
     this.products.push(newProduct);
     await this.saveProducts();
+
+    // Emitir evento de WebSocket con el nuevo producto agregado
+    io.emit("productAdded", newProduct); // Emitir evento al cliente
+
     return newProduct;
   }
 
@@ -119,8 +124,12 @@ class ProductManager {
       throw new Error("Not Found");
     }
 
-    this.products.splice(productIndex, 1); // Eliminar producto
+    const deletedProduct = this.products.splice(productIndex, 1)[0]; // Eliminar producto y guardar en deletedProduct
     await this.saveProducts(); // Guardar cambios en el archivo
+
+    // Emitir evento de WebSocket cuando un producto es eliminado
+    io.emit("productDeleted", deletedProduct); // Emitir evento al cliente
+
     return { message: "Product successfully deleted." };
   }
 

@@ -7,12 +7,16 @@ const router = Router();
 const PRODUCTS_FILE = path.resolve("src/models/products.json"); // Ruta al archivo de productos
 const productManager = new ProductManager(PRODUCTS_FILE); // Crear una instancia de ProductManager
 
-// Obtener todos los productos con limitación
+// Obtener todos los productos y renderizar la vista index.handlebars
 router.get("/", async (req, res) => {
   const limit = parseInt(req.query.limit) || 0; // Limitar resultados
   try {
-    const products = await productManager.getProducts();
-    res.json(limit > 0 ? products.slice(0, limit) : products); // Enviar respuesta
+    const products = await productManager.getProducts(); // Obtener los productos
+
+    // Renderizar la vista index.handlebars y pasar los productos como contexto
+    res.render("index", {
+      products: limit > 0 ? products.slice(0, limit) : products,
+    });
   } catch (error) {
     res.status(500).json({ error: "Error: Unable to retrieve products" });
   }
