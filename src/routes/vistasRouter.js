@@ -17,7 +17,7 @@ router.get("/realtimeproducts", async (req, res) => {
   console.log("GET /realtimeproducts called"); // Agrega esta línea
   try {
     const products = await productManager.getProducts(); // Asegúrate de que esto esté devolviendo la lista de productos
-    res.render("realTimeProducts", { products }); // Renderiza la vista con la lista de productos
+    res.render("realtimeproducts", { products }); // Renderiza la vista con la lista de productos
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).send("Error fetching products");

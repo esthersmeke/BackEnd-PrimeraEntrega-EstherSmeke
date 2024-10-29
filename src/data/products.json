@@ -108,5 +108,16 @@
     "stock": 10,
     "category": "Categoría F",
     "status": true
+  },
+  {
+    "id": 11,
+    "title": "Producto Actualizado",
+    "description": "Descripción actualizada",
+    "price": 200,
+    "thumbnails": [],
+    "code": "PROD210",
+    "stock": 80,
+    "category": "Categoría B",
+    "status": true
   }
 ]

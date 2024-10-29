@@ -1,0 +1,14 @@
+{{! src/views/home.handlebars }}
+
+<h1>{{title}}</h1>
+
+<ul>
+  {{#each products}}
+    <li>
+      <strong>{{this.title}}</strong>
+      -
+      {{this.description}}
+      ({{this.price}})
+    </li>
+  {{/each}}
+</ul>

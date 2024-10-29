@@ -1,27 +1,37 @@
 {{! src/views/realTimeProducts.handlebars }}
 
-<h1>Real Time Products</h1>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{title}}</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/realtime.js"></script>
+  </head>
+  <body>
+    <h1>{{title}}</h1>
 
-<ul id="productList">
-  {{#each products}}
-    <li>
-      <strong>{{this.title}}</strong>
-      - ${{this.price}}
-      <button onclick="deleteProduct({{this.id}})">Eliminar</button>
-    </li>
-  {{/each}}
-</ul>
+    <ul id="productList">
+      {{#each products}}
+        <li data-id="{{this.id}}">
+          <strong>{{this.title}}</strong>
+          -
+          {{this.description}}
+          ({{this.price}})
+        </li>
+      {{/each}}
+    </ul>
 
-<h2>Agregar Producto</h2>
-<form id="productForm">
-  <input type="text" id="title" placeholder="Título" required />
-  <input type="number" id="price" placeholder="Precio" required />
-  <input type="text" id="code" placeholder="Código" required />
-  <input type="number" id="stock" placeholder="Stock" required />
-  <input type="text" id="category" placeholder="Categoría" required />
-  <button type="submit">Agregar Producto</button>
-</form>
+    <!-- Formulario para agregar productos -->
+    <form id="productForm">
+      <input type="text" id="title" placeholder="Título" required />
+      <input type="text" id="description" placeholder="Descripción" required />
+      <input type="number" id="price" placeholder="Precio" required />
+      <input type="text" id="code" placeholder="Código" required />
+      <input type="number" id="stock" placeholder="Stock" required />
+      <input type="text" id="thumbnail" placeholder="URL de la imagen" />
+      <button type="submit">Agregar producto</button>
+    </form>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="../public/js/index.js"></script>
-<!-- Incluyendo el archivo de sockets -->
+  </body>
+</html>
