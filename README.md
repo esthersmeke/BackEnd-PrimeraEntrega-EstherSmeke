@@ -137,12 +137,15 @@ El proyecto está integrado con WebSockets para actualizar la vista de productos
 │ │ └── cartRoutes.js # Rutas para carritos (/api/carts)
 │ │
 │ ├── /views # Vistas con Handlebars
+│ │ └── /layout
+│ │ └── main.handlebars
 │ │ ├── home.handlebars # Vista para listar productos
 │ │ └── realTimeProducts.handlebars # Vista para actualizar productos en tiempo real
 │ │
 │ ├── /public # Archivos estáticos (JS, CSS, imágenes)
 │ │ └── /js
 │ │ └── realtime.js # Lógica de cliente para WebSockets
+│ │└── styles.css
 │ │
 │ ├── /sockets
 │ │ └── socket.js # Configuración y lógica del servidor WebSocket

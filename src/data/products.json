@@ -36,7 +36,7 @@
     "id": 4,
     "title": "Producto D",
     "description": "Descripción del producto D",
-    "price": 120,
+    "": 120,
     "thumbnails": [],
     "code": "PROD100D",
     "stock": 10,
@@ -119,5 +119,27 @@
     "stock": 80,
     "category": "Categoría B",
     "status": true
+  },
+  {
+    "id": 12,
+    "code": "e23",
+    "status": true,
+    "title": "Producto Nuevo",
+    "description": "Enviado desde web",
+    "price": 9,
+    "stock": 0,
+    "category": "equis",
+    "thumbnails": []
+  },
+  {
+    "id": 13,
+    "code": "PROD100K",
+    "status": true,
+    "title": "Producto Web",
+    "description": "Enviado desde web",
+    "price": 199.98,
+    "stock": 9,
+    "category": "Cateegoria Web",
+    "thumbnails": []
   }
 ]

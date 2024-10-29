@@ -1,5 +1,4 @@
-//src/models/ProductManager.js
-
+// src/models/ProductManager.js
 import { promises as fs } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -33,35 +32,43 @@ export class ProductManager {
   // Método para obtener un producto por ID
   async getProductById(id) {
     const products = await this.getProducts();
-    // Convertimos el id a número para asegurar una comparación correcta
     const product = products.find((product) => product.id === Number(id));
     return product || { error: "Producto no encontrado" };
   }
 
   // Método para agregar un nuevo producto
   async addProduct(productData) {
-    // Validamos que todos los campos sean obligatorios
-    if (
-      !productData.title ||
-      !productData.description ||
-      !productData.price ||
-      !productData.code ||
-      !productData.stock ||
-      !productData.thumbnails
-    ) {
-      throw new Error("Todos los campos son obligatorios");
+    // Si no se proporciona 'thumbnails', asignar un arreglo vacío
+    productData.thumbnails = productData.thumbnails || [];
+
+    // Validar que todos los campos obligatorios estén presentes
+    const requiredFields = [
+      "title",
+      "description",
+      "price",
+      "stock",
+      "category",
+    ];
+    for (const field of requiredFields) {
+      if (
+        productData[field] === undefined ||
+        productData[field] === null ||
+        productData[field] === ""
+      ) {
+        console.error(
+          `El campo '${field}' es obligatorio, valor recibido: ${productData[field]}`
+        );
+        throw new Error(`El campo '${field}' es obligatorio`);
+      }
     }
 
-    // Validamos que no se repita el código "code"
-    const productExists = this.products.some(
-      (product) => product.code === productData.code
-    );
-    if (productExists) {
-      throw new Error("El código ya existe");
-    }
+    // Generar un código único automáticamente para cada producto nuevo
+    const code = `PROD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
     const newProduct = {
       id: this._generateId(),
+      code, // Asignar el código generado automáticamente
+      status: true, // Agregar 'status' con valor predeterminado de true
       ...productData,
     };
 
@@ -82,8 +89,6 @@ export class ProductManager {
     }
 
     const updatedProduct = { ...products[productIndex], ...updateData };
-
-    // Asegurarse de que el ID no se modifique
     updatedProduct.id = products[productIndex].id;
 
     products[productIndex] = updatedProduct;
@@ -98,18 +103,16 @@ export class ProductManager {
       (product) => product.id !== Number(id)
     );
 
-    // Si no se eliminó ningún producto, devolvemos un error
     if (products.length === filteredProducts.length) {
       return { error: "Producto no encontrado" };
     }
 
-    // Guardar los productos filtrados
     await this._saveProducts(filteredProducts);
     return { message: "Producto eliminado" };
   }
 
   // Método privado para guardar productos en el archivo
-  async _saveProducts(products) {
+  async _saveProducts(products = this.products) {
     try {
       await fs.writeFile(this.filePath, JSON.stringify(products, null, 2));
     } catch (error) {

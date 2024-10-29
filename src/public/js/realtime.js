@@ -1,37 +1,48 @@
-//src/public/js/realtime.js
-const socket = io();
+document.addEventListener("DOMContentLoaded", () => {
+  const socket = io("http://localhost:8080");
+  const productContainer = document.getElementById("products");
+  const productForm = document.getElementById("productForm");
 
-// Escuchar el evento de actualización de productos
-socket.on("updateProducts", (newProduct) => {
-  const productList = document.getElementById("productList");
-  const newListItem = document.createElement("li");
-  newListItem.innerHTML = `<strong>${newProduct.title}</strong> - ${newProduct.description} (${newProduct.price})`;
-  productList.appendChild(newListItem);
-});
+  socket.on("productList", (products) => {
+    productContainer.innerHTML = "";
+    products.forEach((product) => {
+      productContainer.innerHTML += `
+        <li>
+          <h2>${product.title}</h2>
+          <p>${product.description}</p>
+          <p>Código: ${product.code}</p>
+          <p>Precio: ${product.price}</p>
+          <p>Stock: ${product.stock}</p>
+          <p>Categoría: ${product.category}</p>
+          <p>Status: ${product.status ? "Disponible" : "No disponible"}</p>
+          <p>Thumbnails: ${product.thumbnails
+            .map((thumbnail) => `<span>${thumbnail}</span>`)
+            .join("")}</p>
+          <button onclick="deleteProduct('${product.id}')">Eliminar</button>
+        </li>
+      `;
+    });
+  });
 
-// Escuchar la eliminación de un producto
-socket.on("removeProduct", (productId) => {
-  const productList = document.getElementById("productList");
-  const productItem = productList.querySelector(`li[data-id="${productId}"]`);
-  if (productItem) {
-    productList.removeChild(productItem);
-  }
-});
+  productForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const newProduct = {
+      title: document.getElementById("title").value,
+      description: document.getElementById("description").value,
+      price: parseFloat(document.getElementById("price").value),
+      stock: parseInt(document.getElementById("stock").value),
+      category: document.getElementById("category").value,
+      code: document.getElementById("code").value,
+    };
+    socket.emit("newProduct", newProduct);
+    productForm.reset();
+  });
 
-// Manejar el envío del formulario
-document.getElementById("productForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const newProduct = {
-    title: document.getElementById("title").value,
-    description: document.getElementById("description").value,
-    price: document.getElementById("price").value,
-    code: document.getElementById("code").value,
-    stock: document.getElementById("stock").value,
-    thumbnail: document.getElementById("thumbnail").value,
+  window.deleteProduct = (productId) => {
+    socket.emit("deleteProduct", productId);
   };
-
-  socket.emit("addProduct", newProduct); // Enviamos el nuevo producto vía WebSocket
-
-  // Limpiar el formulario
-  document.getElementById("productForm").reset();
+  // Manejar errores desde el servidor
+  socket.on("error", (error) => {
+    alert(error.message);
+  });
 });
