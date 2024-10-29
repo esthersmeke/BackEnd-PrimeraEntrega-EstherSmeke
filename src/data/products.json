@@ -141,5 +141,15 @@
     "stock": 9,
     "category": "Cateegoria Web",
     "thumbnails": []
+  },
+  {
+    "id": 14,
+    "title": "Desde Postman Consola",
+    "description": "Descripción del producto",
+    "code": "PROD345",
+    "price": 120.5,
+    "stock": 15,
+    "category": "Categoría X",
+    "thumbnails": []
   }
 ]

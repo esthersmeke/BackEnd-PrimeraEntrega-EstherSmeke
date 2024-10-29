@@ -1,3 +1,4 @@
+// /src/controllers/cartController.js
 import { CartManager } from "../models/CartManager.js";
 import { HttpStatus } from "../utils/constants.js";
 
@@ -8,7 +9,10 @@ export const getAllCarts = async (req, res) => {
     const carts = await cartManager.getCarts();
     res.status(HttpStatus.OK).json(carts);
   } catch (error) {
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    console.error(`Error al obtener todos los carritos: ${error.message}`);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ error: `Error interno al obtener los carritos.` });
   }
 };
 
@@ -18,7 +22,10 @@ export const createCart = async (req, res) => {
     const newCart = await cartManager.createCart();
     res.status(HttpStatus.CREATED).json(newCart);
   } catch (error) {
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    console.error(`Error al crear un nuevo carrito: ${error.message}`);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ error: `Error interno al crear un nuevo carrito.` });
   }
 };
 
@@ -28,12 +35,17 @@ export const getCartById = async (req, res) => {
   try {
     const cart = await cartManager.getCartById(cid);
     if (cart.error) {
-      res.status(HttpStatus.NOT_FOUND).json({ message: cart.error });
+      res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ message: `Carrito con ID ${cid} no encontrado.` });
     } else {
       res.status(HttpStatus.OK).json(cart);
     }
   } catch (error) {
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    console.error(`Error al obtener carrito con ID ${cid}: ${error.message}`);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ error: `Error interno al obtener el carrito con ID ${cid}.` });
   }
 };
 
@@ -48,6 +60,13 @@ export const addProductToCart = async (req, res) => {
       res.status(HttpStatus.OK).json(updatedCart);
     }
   } catch (error) {
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    console.error(
+      `Error al agregar producto con ID ${pid} al carrito con ID ${cid}: ${error.message}`
+    );
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({
+        error: `Error interno al agregar el producto con ID ${pid} al carrito con ID ${cid}.`,
+      });
   }
 };

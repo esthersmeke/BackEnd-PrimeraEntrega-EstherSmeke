@@ -26,30 +26,57 @@ export const getProductById = async (req, res) => {
   try {
     const product = await productManager.getProductById(pid);
     if (product.error) {
-      res.status(HttpStatus.NOT_FOUND).json({ message: product.error });
+      res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ message: `Producto con ID ${pid} no encontrado.` });
     } else {
       res.status(HttpStatus.OK).json(product);
     }
   } catch (error) {
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    console.error(`Error al obtener producto con ID ${pid}: ${error.message}`);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ error: `Error interno al obtener el producto con ID ${pid}.` });
   }
 };
 
 // Controlador para agregar un nuevo producto
 export const addProduct = async (req, res) => {
-  const { title, description, code, price, stock, thumbnails } = req.body;
+  const {
+    title,
+    description,
+    code,
+    price,
+    stock,
+    category,
+    status,
+    thumbnails,
+  } = req.body;
   try {
+    if (!title || !description || !code || !price || !stock || !category) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({
+          error:
+            "Todos los campos (title, description, code, price, stock, category) son obligatorios.",
+        });
+    }
     const newProduct = await productManager.addProduct({
       title,
       description,
       code,
       price,
       stock,
+      category,
+      status,
       thumbnails,
     });
     res.status(HttpStatus.CREATED).json(newProduct);
   } catch (error) {
-    res.status(HttpStatus.BAD_REQUEST).json({ error: error.message });
+    console.error(`Error al agregar el producto: ${error.message}`);
+    res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ error: `Error al agregar el producto: ${error.message}` });
   }
 };
 

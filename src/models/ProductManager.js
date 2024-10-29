@@ -38,6 +38,14 @@ export class ProductManager {
 
   // Método para agregar un nuevo producto
   async addProduct(productData) {
+    // Validar si el código ya existe
+    const codeExists = this.products.some(
+      (product) => product.code === productData.code
+    );
+    if (codeExists) {
+      throw new Error("El código del producto ya existe. Debe ser único.");
+    }
+
     // Si no se proporciona 'thumbnails', asignar un arreglo vacío
     productData.thumbnails = productData.thumbnails || [];
 
@@ -62,12 +70,8 @@ export class ProductManager {
       }
     }
 
-    // Generar un código único automáticamente para cada producto nuevo
-    const code = `PROD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
     const newProduct = {
       id: this._generateId(),
-      code, // Asignar el código generado automáticamente
       status: true, // Agregar 'status' con valor predeterminado de true
       ...productData,
     };
@@ -79,6 +83,19 @@ export class ProductManager {
 
   // Método para actualizar un producto por ID
   async updateProduct(id, updateData) {
+    // Validar si el código ya existe en otro producto
+    if (updateData.code) {
+      const codeExists = this.products.some(
+        (product) =>
+          product.code === updateData.code && product.id !== Number(id)
+      );
+      if (codeExists) {
+        throw new Error(
+          "El código del producto ya existe en otro producto. Debe ser único."
+        );
+      }
+    }
+
     const products = await this.getProducts();
     const productIndex = products.findIndex(
       (product) => product.id === Number(id)
