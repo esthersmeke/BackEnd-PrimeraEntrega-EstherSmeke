@@ -14,7 +14,12 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const httpServer = HttpServer(app);
-const io = new IOServer(httpServer);
+const io = new IOServer(httpServer, {
+  cors: {
+    origin: "*", // Puedes limitar esto al origen específico si quieres más seguridad
+    methods: ["GET", "POST"],
+  },
+});
 
 const productManager = new ProductManager();
 
@@ -55,26 +60,40 @@ app.get("/realtimeproducts", async (req, res) => {
   res.render("realTimeProducts");
 });
 
+// Escuchar cuando un cliente se conecta
 io.on("connection", async (socket) => {
   console.log("Nuevo cliente conectado");
 
   // Enviar la lista inicial de productos cuando el cliente se conecta
-  const products = await productManager.getProducts();
-  socket.emit("productList", products);
+  try {
+    const products = await productManager.getProducts();
+    socket.emit("productList", products);
+  } catch (error) {
+    console.error(
+      `Error al obtener productos al conectar un nuevo cliente: ${error.message}`
+    );
+    socket.emit(
+      "connectionError",
+      "Error al conectar con el servidor. No se pudieron cargar los productos."
+    );
+  }
 
   // Escuchar para cambios en productos y emitir a todos los clientes conectados
   socket.on("newProduct", async (product) => {
-    const existingProduct = productManager.products.find(
-      (p) => p.code === product.code
-    );
-    if (existingProduct) {
-      socket.emit("error", {
-        message: "El código del producto debe ser único.",
-      });
-      return;
-    }
-
+    console.log("Producto recibido para agregar:", product); // <-- Agregar esta línea
     try {
+      // Obtener la lista de productos actualizada antes de verificar si el código ya existe
+      const products = await productManager.getProducts();
+      console.log("Lista actual de productos:", products); // <-- Agregar esta línea
+
+      const existingProduct = products.find((p) => p.code === product.code);
+      if (existingProduct) {
+        socket.emit("error", {
+          message: "El código del producto debe ser único.",
+        });
+        return;
+      }
+
       await productManager.addProduct(product);
       const updatedProducts = await productManager.getProducts();
       io.emit("productList", updatedProducts);
@@ -83,16 +102,27 @@ io.on("connection", async (socket) => {
     }
   });
 
+  // Escuchar para eliminar un producto y emitir a todos los clientes conectados
   socket.on("deleteProduct", async (productId) => {
     try {
       await productManager.deleteProduct(productId);
       const updatedProducts = await productManager.getProducts();
       io.emit("productList", updatedProducts);
     } catch (error) {
-      console.error("Error al eliminar el producto:", error.message);
+      console.error(
+        `Error al eliminar el producto con ID ${productId}: ${error.message}`
+      );
+      socket.emit("error", {
+        message: `Error al eliminar el producto con ID ${productId}: ${error.message}`,
+      });
     }
   });
-}); // <- Aquí se cierra el bloque de `io.on('connection', ...)`
+
+  // Escuchar cuando un cliente se desconecta
+  socket.on("disconnect", () => {
+    console.log("Cliente desconectado");
+  });
+});
 
 // Iniciar el servidor
 const PORT = 8080;

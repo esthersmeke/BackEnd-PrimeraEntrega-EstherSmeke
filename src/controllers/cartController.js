@@ -37,7 +37,9 @@ export const getCartById = async (req, res) => {
     if (cart.error) {
       res
         .status(HttpStatus.NOT_FOUND)
-        .json({ message: `Carrito con ID ${cid} no encontrado.` });
+        .json({
+          message: `Carrito con ID ${cid} no encontrado. Verifique si el ID es correcto o si el carrito fue creado.`,
+        });
     } else {
       res.status(HttpStatus.OK).json(cart);
     }
@@ -66,7 +68,7 @@ export const addProductToCart = async (req, res) => {
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
       .json({
-        error: `Error interno al agregar el producto con ID ${pid} al carrito con ID ${cid}.`,
+        error: `Error interno al agregar el producto con ID ${pid} al carrito con ID ${cid}. Verifique los detalles y vuelva a intentarlo.`,
       });
   }
 };

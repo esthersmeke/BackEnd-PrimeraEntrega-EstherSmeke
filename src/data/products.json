@@ -151,5 +151,16 @@
     "stock": 15,
     "category": "Categoría X",
     "thumbnails": []
+  },
+  {
+    "id": 15,
+    "status": true,
+    "title": "revision",
+    "description": "wew",
+    "price": 9,
+    "stock": 9,
+    "category": "ewkdn",
+    "code": "9023en",
+    "thumbnails": []
   }
 ]

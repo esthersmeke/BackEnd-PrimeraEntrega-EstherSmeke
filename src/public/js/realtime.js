@@ -1,5 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const socket = io("http://localhost:8080");
+  const socket = io({
+    transports: ["websocket"], // Fuerza el uso de WebSocket solamente
+  }); // Aquí se establece la conexión con el servidor WebSocket
+
+  // Añadir el mensaje para confirmar la conexión con el servidor WebSocket
+  socket.on("connect", () => {
+    console.log("Conectado al servidor WebSocket");
+  });
+
   const productContainer = document.getElementById("products");
   const productForm = document.getElementById("productForm");
 
@@ -10,14 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <li>
           <h2>${product.title}</h2>
           <p>${product.description}</p>
-          <p>Código: ${product.code}</p>
           <p>Precio: ${product.price}</p>
           <p>Stock: ${product.stock}</p>
           <p>Categoría: ${product.category}</p>
-          <p>Status: ${product.status ? "Disponible" : "No disponible"}</p>
-          <p>Thumbnails: ${product.thumbnails
-            .map((thumbnail) => `<span>${thumbnail}</span>`)
-            .join("")}</p>
           <button onclick="deleteProduct('${product.id}')">Eliminar</button>
         </li>
       `;
@@ -27,12 +30,12 @@ document.addEventListener("DOMContentLoaded", () => {
   productForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const newProduct = {
+      code: document.getElementById("code").value, // Asegurarse de enviar el código
       title: document.getElementById("title").value,
       description: document.getElementById("description").value,
       price: parseFloat(document.getElementById("price").value),
       stock: parseInt(document.getElementById("stock").value),
       category: document.getElementById("category").value,
-      code: document.getElementById("code").value,
     };
     socket.emit("newProduct", newProduct);
     productForm.reset();
@@ -41,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.deleteProduct = (productId) => {
     socket.emit("deleteProduct", productId);
   };
+
   // Manejar errores desde el servidor
   socket.on("error", (error) => {
     alert(error.message);
