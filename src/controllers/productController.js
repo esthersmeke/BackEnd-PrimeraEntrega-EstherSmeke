@@ -1,6 +1,6 @@
 //src/controllers/productController.js
 import { ProductManager } from "../models/ProductManager.js";
-import { HttpStatus } from "../utils/constants.js"; // Importamos las constantes
+import { HttpStatus } from "../utils/constants.js";
 
 const productManager = new ProductManager("./data/products.json");
 
@@ -54,12 +54,10 @@ export const addProduct = async (req, res) => {
   } = req.body;
   try {
     if (!title || !description || !code || !price || !stock || !category) {
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json({
-          error:
-            "Todos los campos (title, description, code, price, stock, category) son obligatorios.",
-        });
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        error:
+          "Todos los campos (title, description, code, price, stock, category) son obligatorios.",
+      });
     }
     const newProduct = await productManager.addProduct({
       title,

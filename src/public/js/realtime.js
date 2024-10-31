@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   productForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const newProduct = {
-      code: document.getElementById("code").value, // Asegurarse de enviar el código
+      code: document.getElementById("code").value,
       title: document.getElementById("title").value,
       description: document.getElementById("description").value,
       price: parseFloat(document.getElementById("price").value),

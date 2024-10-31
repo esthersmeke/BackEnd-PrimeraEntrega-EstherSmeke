@@ -16,7 +16,7 @@ const app = express();
 const httpServer = HttpServer(app);
 const io = new IOServer(httpServer, {
   cors: {
-    origin: "*", // Puedes limitar esto al origen específico si quieres más seguridad
+    origin: "*", // Se puede limitar esto al origen específico si para más seguridad
     methods: ["GET", "POST"],
   },
 });
@@ -80,11 +80,11 @@ io.on("connection", async (socket) => {
 
   // Escuchar para cambios en productos y emitir a todos los clientes conectados
   socket.on("newProduct", async (product) => {
-    console.log("Producto recibido para agregar:", product); // <-- Agregar esta línea
+    console.log("Producto recibido para agregar:", product);
     try {
       // Obtener la lista de productos actualizada antes de verificar si el código ya existe
       const products = await productManager.getProducts();
-      console.log("Lista actual de productos:", products); // <-- Agregar esta línea
+      console.log("Lista actual de productos:", products);
 
       const existingProduct = products.find((p) => p.code === product.code);
       if (existingProduct) {
