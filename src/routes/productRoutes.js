@@ -1,7 +1,7 @@
 // src/routes/productRoutes.js
 import { Router } from "express";
 import {
-  getAllProducts,
+  getProducts, // Este controlador incluirá paginación, filtros y ordenamiento
   getProductById,
   addProduct,
   updateProduct,
@@ -10,8 +10,8 @@ import {
 
 const router = Router();
 
-// Ruta para obtener todos los productos
-router.get("/", getAllProducts);
+// Ruta para obtener todos los productos con paginación, filtros y ordenamiento
+router.get("/", getProducts);
 
 // Ruta para obtener un producto por ID
 router.get("/:pid", getProductById);

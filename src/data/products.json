@@ -36,7 +36,7 @@
     "id": 4,
     "title": "Producto D",
     "description": "Descripción del producto D",
-    "": 120,
+    "price": 120,
     "thumbnails": [],
     "code": "PROD100D",
     "stock": 10,

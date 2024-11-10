@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <li>
           <h2>${product.title}</h2>
           <p>${product.description}</p>
+          <p>Código: ${product.code}</p>
           <p>Precio: ${product.price}</p>
           <p>Stock: ${product.stock}</p>
           <p>Categoría: ${product.category}</p>

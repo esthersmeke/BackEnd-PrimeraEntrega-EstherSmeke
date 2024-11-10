@@ -1,22 +1,15 @@
 import express from "express";
-import ProductManager from "../models/ProductManager.js";
-import path from "path";
-import { fileURLToPath } from "url";
+import { ProductManager } from "../dao/ProductManager.js"; // Manager de MongoDB
 
 const router = express.Router();
+const productManager = new ProductManager(); // No necesitas pasar la ruta del archivo
 
-// Obtener la ruta del archivo actual
-const __filename = fileURLToPath(import.meta.url); // Ruta del archivo actual
-const __dirname = path.dirname(__filename); // Directorio del archivo actual
-
-const productsPath = path.join(__dirname, "../models/products.json");
-const productManager = new ProductManager(productsPath); // Pasar la ruta del archivo
-
+// Ruta para la vista de productos en tiempo real
 router.get("/realtimeproducts", async (req, res) => {
   console.log("GET /realtimeproducts called");
   try {
-    const products = await productManager.getProducts();
-    res.render("realtimeproducts", { products }); // Renderiza la vista con la lista de productos
+    const products = await productManager.getProducts(); // Obtener productos desde MongoDB
+    res.render("realtimeproducts", { products }); // Renderiza la vista con los productos de MongoDB
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).send("Error fetching products");
