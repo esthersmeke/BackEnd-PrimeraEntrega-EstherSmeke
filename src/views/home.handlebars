@@ -36,14 +36,15 @@
 </ul>
 
 <div>
-  {{#if prevLink}}
-    <a href="{{prevLink}}">Página Anterior</a>
+  {{#if hasPrevPage}}
+    <a
+      href="?page={{prevPage}}&limit={{limit}}&sort={{sort}}&query={{query}}"
+    >Página Anterior</a>
   {{/if}}
   <span>Página {{page}} de {{totalPages}}</span>
-  {{#if nextLink}}
+  {{#if hasNextPage}}
     <a
-      href="{{nextLink}}
-"
+      href="?page={{nextPage}}&limit={{limit}}&sort={{sort}}&query={{query}}"
     >Página Siguiente</a>
   {{/if}}
 </div>

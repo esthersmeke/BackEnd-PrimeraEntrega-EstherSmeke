@@ -1,44 +1,47 @@
+// public/js/realtime.js
 document.addEventListener("DOMContentLoaded", () => {
   const socket = io({
     transports: ["websocket"], // Fuerza el uso de WebSocket solamente
-  }); // Aquí se establece la conexión con el servidor WebSocket
-
-  // Añadir el mensaje para confirmar la conexión con el servidor WebSocket
-  socket.on("connect", () => {
-    console.log("Conectado al servidor WebSocket");
   });
 
   const productContainer = document.getElementById("products");
   const productForm = document.getElementById("productForm");
 
-  socket.on("productList", (products) => {
-    productContainer.innerHTML = "";
-    products.forEach((product) => {
-      productContainer.innerHTML += `
-        <li>
-          <h2>${product.title}</h2>
-          <p>${product.description}</p>
-          <p>Código: ${product.code}</p>
-          <p>Precio: ${product.price}</p>
-          <p>Stock: ${product.stock}</p>
-          <p>Categoría: ${product.category}</p>
-          <button onclick="deleteProduct('${product._id}')">Eliminar</button>
-        </li>
-      `;
-    });
+  // Escuchar el evento 'updateProducts' y asegurarnos de que recibimos solo el array
+  socket.on("updateProducts", (products) => {
+    console.log("Productos recibidos en el cliente:", products);
+
+    if (Array.isArray(products)) {
+      productContainer.innerHTML = "";
+      products.forEach((product) => {
+        productContainer.innerHTML += `
+          <li>
+            <h2>${product.title}</h2>
+            <p>${product.description}</p>
+            <p>Código: ${product.code}</p>
+            <p>Precio: ${product.price}</p>
+            <p>Stock: ${product.stock}</p>
+            <p>Categoría: ${product.category}</p>
+            <button onclick="deleteProduct('${product._id}')">Eliminar</button>
+          </li>
+        `;
+      });
+    } else {
+      console.error("Error: La lista de productos no es un array:", products);
+    }
   });
 
   productForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const newProduct = {
-      code: document.getElementById("code").value,
       title: document.getElementById("title").value,
       description: document.getElementById("description").value,
+      code: document.getElementById("code").value,
       price: parseFloat(document.getElementById("price").value),
       stock: parseInt(document.getElementById("stock").value),
       category: document.getElementById("category").value,
     };
-    socket.emit("newProduct", newProduct);
+    socket.emit("addProduct", newProduct);
     productForm.reset();
   });
 
@@ -46,8 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
     socket.emit("deleteProduct", productId);
   };
 
-  // Manejar errores desde el servidor
-  socket.on("error", (error) => {
+  socket.on("productError", (error) => {
     alert(error.message);
   });
 });

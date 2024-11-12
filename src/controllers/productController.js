@@ -7,7 +7,8 @@ import mongoose from "mongoose"; // Importa mongoose para validaciones de ID
 
 // Controlador para obtener todos los productos con paginación, filtros y ordenamiento
 export const getProducts = async (req, res) => {
-  const { limit = 10, page = 1, sort, query } = req.query;
+  // Asigna valores predeterminados si `sort` o `query` son undefined
+  const { limit = 10, page = 1, sort = "asc", query = "" } = req.query;
 
   try {
     // Obtener o crear un carrito para el usuario
@@ -38,6 +39,7 @@ export const getProducts = async (req, res) => {
       : {};
 
     const productsData = await Product.paginate(filter, options);
+    // Ajuste para que los enlaces de paginación mantengan `sort` y `query`
     const baseUrl = `${req.protocol}://${req.get("host")}${req.originalUrl
       .split("?")
       .shift()}`;
@@ -48,9 +50,14 @@ export const getProducts = async (req, res) => {
       ? `${baseUrl}?page=${productsData.nextPage}&limit=${limit}&sort=${sort}&query=${query}`
       : null;
 
+    const totalDocs = productsData.totalDocs; // Total de productos en la base de datos
+    const docsCount = productsData.docs.length; // Cantidad de productos mostrados en la página actual
+
     const response = {
       status: "success", // o "error" en caso de fallos
       payload: productsData.docs, // resultado de los productos paginados
+      totalDocs: totalDocs, // Total de productos
+      docsCount: docsCount, // Productos mostrados en esta página
       totalPages: productsData.totalPages,
       prevPage: productsData.prevPage,
       nextPage: productsData.nextPage,
@@ -96,7 +103,15 @@ export const getProductById = async (req, res) => {
     }
 
     if (product) {
-      res.render("productDetail", { product, cartId: cart._id }); // Pasamos el `cartId`
+      // Verifica si la solicitud es JSON para responder en JSON (Postman) o HTML (Navegador)
+      if (
+        req.headers.accept &&
+        req.headers.accept.includes("application/json")
+      ) {
+        res.json({ product, cartId: cart._id }); // Responder en JSON para solicitudes como Postman
+      } else {
+        res.render("productDetail", { product, cartId: cart._id }); // Renderizar la vista en HTML para navegador
+      }
     } else {
       res
         .status(HttpStatus.NOT_FOUND)
@@ -114,6 +129,25 @@ export const getProductById = async (req, res) => {
 
 // Controlador para agregar un nuevo producto
 export const addProduct = async (req, res) => {
+  const requiredFields = [
+    "title",
+    "description",
+    "code",
+    "price",
+    "stock",
+    "category",
+  ];
+  const missingFields = requiredFields.filter((field) => !req.body[field]);
+
+  // Verificar si falta algún campo obligatorio
+  if (missingFields.length > 0) {
+    return res.status(HttpStatus.BAD_REQUEST).json({
+      error: `Error al agregar el producto. El campo '${missingFields.join(
+        ", "
+      )}' es obligatorio.`,
+    });
+  }
+
   try {
     const product = await Product.create(req.body);
     res.status(HttpStatus.CREATED).json(product);

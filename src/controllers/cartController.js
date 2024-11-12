@@ -1,6 +1,7 @@
 // src/controllers/cartController.js
 
 import { Cart } from "../models/Cart.js";
+import { Product } from "../models/Product.js"; // Importación del modelo de producto
 import mongoose from "mongoose";
 import { HttpStatus } from "../utils/constants.js";
 
@@ -91,6 +92,14 @@ export const addProductToCart = async (req, res) => {
         .json({ error: "La cantidad debe ser un valor positivo" });
     }
 
+    // Verificar si el producto existe en la base de datos
+    const product = await Product.findById(pid);
+    if (!product) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ error: `Producto con ID ${pid} no encontrado` });
+    }
+
     const updatedCart = await Cart.findByIdAndUpdate(
       cid,
       {
@@ -123,6 +132,25 @@ export const removeProductFromCart = async (req, res) => {
         .json({ error: "ID de carrito o producto no válido" });
     }
 
+    // Buscar el carrito
+    const cart = await Cart.findById(cid);
+    if (!cart) {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        error: `Carrito con ID ${cid} no encontrado`,
+      });
+    }
+
+    // Verificar si el producto está en el carrito
+    const productInCart = cart.products.find((item) =>
+      item.product.equals(pid)
+    );
+    if (!productInCart) {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        error: `Producto con ID ${pid} no encontrado en el carrito`,
+      });
+    }
+
+    // Eliminar el producto del carrito
     const updatedCart = await Cart.findByIdAndUpdate(
       cid,
       {

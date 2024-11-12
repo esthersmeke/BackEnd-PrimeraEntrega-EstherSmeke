@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import productRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
+import { router as vistasRouter } from "./routes/vistasRouter.js";
 import { Server as HttpServer } from "http";
 import { Server as IOServer } from "socket.io";
 import { engine } from "express-handlebars";
@@ -14,6 +15,7 @@ import {
   getProductById,
 } from "./controllers/productController.js";
 import { getOrCreateCart, getCartById } from "./controllers/cartController.js";
+import { configureSocket } from "./sockets/configureSocket.js"; // Importamos el archivo de configuración de sockets
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,10 +24,11 @@ const app = express();
 const httpServer = HttpServer(app);
 const io = new IOServer(httpServer, {
   cors: {
-    origin: "*", // Se puede limitar esto al origen específico si para más seguridad
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
+
 // Conectar a MongoDB Atlas
 const mongoURI =
   "mongodb+srv://esthersmeke:coder@cluster0.ayouo.mongodb.net/ecommerceBe1?retryWrites=true&w=majority";
@@ -62,6 +65,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // Rutas de productos y carritos
 app.use("/api/products", productRoutes);
 app.use("/api/carts", cartRoutes);
+app.use("/", vistasRouter);
 
 // Rutas de vistas
 app.get("/products", getProducts); // Controlador para renderizar lista de productos
@@ -77,73 +81,8 @@ app.get("/my-cart", async (req, res) => {
   }
 });
 
-app.get("/realtimeproducts", async (req, res) => {
-  res.render("realTimeProducts");
-});
-
-// Escuchar cuando un cliente se conecta
-io.on("connection", async (socket) => {
-  console.log("Nuevo cliente conectado");
-
-  // Enviar la lista inicial de productos cuando el cliente se conecta
-  try {
-    const products = await productManager.getProducts();
-    socket.emit("productList", products);
-  } catch (error) {
-    console.error(
-      `Error al obtener productos al conectar un nuevo cliente: ${error.message}`
-    );
-    socket.emit(
-      "connectionError",
-      "Error al conectar con el servidor. No se pudieron cargar los productos."
-    );
-  }
-
-  // Escuchar para cambios en productos y emitir a todos los clientes conectados
-  socket.on("newProduct", async (product) => {
-    console.log("Producto recibido para agregar:", product);
-    try {
-      // Obtener la lista de productos actualizada antes de verificar si el código ya existe
-      const products = await productManager.getProducts();
-      console.log("Lista actual de productos:", products);
-
-      const existingProduct = products.find((p) => p.code === product.code);
-      if (existingProduct) {
-        socket.emit("error", {
-          message: "El código del producto debe ser único.",
-        });
-        return;
-      }
-
-      await productManager.addProduct(product);
-      const updatedProducts = await productManager.getProducts();
-      io.emit("productList", updatedProducts);
-    } catch (error) {
-      console.error("Error al agregar el producto:", error.message);
-    }
-  });
-
-  // Escuchar para eliminar un producto y emitir a todos los clientes conectados
-  socket.on("deleteProduct", async (productId) => {
-    try {
-      await productManager.deleteProduct(productId);
-      const updatedProducts = await productManager.getProducts();
-      io.emit("productList", updatedProducts);
-    } catch (error) {
-      console.error(
-        `Error al eliminar el producto con ID ${productId}: ${error.message}`
-      );
-      socket.emit("error", {
-        message: `Error al eliminar el producto con ID ${productId}: ${error.message}`,
-      });
-    }
-  });
-
-  // Escuchar cuando un cliente se desconecta
-  socket.on("disconnect", () => {
-    console.log("Cliente desconectado");
-  });
-});
+// Configuración de WebSocket usando configureSocket
+configureSocket(io, productManager);
 
 // Iniciar el servidor
 const PORT = 8080;
