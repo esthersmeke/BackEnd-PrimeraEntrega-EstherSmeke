@@ -1,24 +1,19 @@
-// /public/js/cartActions.js
-
-async function removeFromCart(cartId, productId) {
+// public/js/cartActions.js
+async function clearCart(cartId) {
   try {
-    const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
+    const response = await fetch(`/api/carts/${cartId}`, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
     });
 
     if (response.ok) {
-      alert("Producto eliminado del carrito correctamente.");
-      // Opcionalmente, puedes recargar la página para actualizar la lista
-      window.location.reload();
+      alert("Carrito vaciado con éxito.");
+      window.location.reload(); // Recargar la página para mostrar el carrito vacío
     } else {
       const errorData = await response.json();
-      alert(`Error al eliminar el producto: ${errorData.error}`);
+      alert("Error al vaciar el carrito: " + errorData.error);
     }
   } catch (error) {
-    console.error("Error en la solicitud:", error);
-    alert("Ocurrió un error al intentar eliminar el producto.");
+    console.error("Error al vaciar el carrito:", error);
+    alert("Ocurrió un error al vaciar el carrito.");
   }
 }

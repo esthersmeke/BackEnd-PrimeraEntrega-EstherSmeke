@@ -1,215 +1,212 @@
 // src/controllers/cartController.js
-import { CartManager } from "../dao/CartManager.js"; // Importa desde `dao`
-import { HttpStatus } from "../utils/constants.js";
-import mongoose from "mongoose";
-import { Cart } from "../models/Cart.js";
 
-const cartManager = new CartManager();
+import { Cart } from "../models/Cart.js";
+import mongoose from "mongoose";
+import { HttpStatus } from "../utils/constants.js";
+
+// Controlador para obtener o crear un carrito
+export const getOrCreateCart = async () => {
+  let cart = await Cart.findOne(); // Ajusta esto a la lógica de usuario o sesión
+  if (!cart) {
+    cart = await Cart.create({ products: [] });
+  }
+  return cart;
+};
 
 // Controlador para obtener todos los carritos
 export const getAllCarts = async (req, res) => {
   try {
-    const carts = await cartManager.getCarts();
+    const carts = await Cart.find().lean();
     res.status(HttpStatus.OK).json(carts);
   } catch (error) {
-    console.error(`Error al obtener todos los carritos: ${error.message}`);
+    console.error("Error al obtener todos los carritos:", error.message);
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
       .json({ error: "Error al obtener los carritos" });
   }
 };
 
-// Controlador para obtener un carrito por ID
-export const getCartById = async ({ params: { cid } }) => {
+// Controlador para obtener un carrito por ID y renderizar la vista del carrito
+export const getCartById = async (req, res) => {
+  const { cid } = req.params;
   try {
-    const cart = await cartManager.getCartById(cid);
-    if (cart) {
-      return cart; // Devuelve el carrito encontrado
+    if (!mongoose.Types.ObjectId.isValid(cid)) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ error: "ID de carrito no válido" });
+    }
+
+    const cart = await Cart.findById(cid).populate("products.product").lean();
+    if (!cart) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ error: "Carrito no encontrado" });
+    }
+    // Respuesta condicional según el tipo de solicitud
+    if (req.headers.accept && req.headers.accept.includes("application/json")) {
+      // Responder en JSON para solicitudes de API como en Postman
+      res.json({ status: "success", cart });
     } else {
-      throw new Error(`Carrito con ID ${cid} no encontrado.`);
+      // Renderizar la vista para solicitudes en el navegador
+      res.render("cart", { cart });
     }
   } catch (error) {
-    console.error(
-      `Error al obtener el carrito con ID ${cid}: ${error.message}`
-    );
-    throw new Error("Error al obtener el carrito");
+    console.error(`Error al cargar el carrito con ID ${cid}: ${error.message}`);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ error: "Error al cargar el carrito" });
   }
 };
 
 // Controlador para crear un nuevo carrito
 export const createCart = async (req, res) => {
   try {
-    const newCart = await cartManager.addCart();
+    const newCart = await Cart.create({ products: [] });
     res.status(HttpStatus.CREATED).json(newCart);
   } catch (error) {
-    console.error(`Error al crear el carrito: ${error.message}`);
+    console.error("Error al crear el carrito:", error.message);
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
       .json({ error: "Error al crear el carrito" });
   }
 };
 
-// Controlador para agregar un producto a un carrito
+// Controlador para agregar un producto al carrito
 export const addProductToCart = async (req, res) => {
   const { cid, pid } = req.params;
-  const { quantity } = req.body;
+  const { quantity = 1 } = req.body;
 
   try {
-    const updatedCart = await cartManager.addProductToCart(cid, pid, quantity);
-    if (updatedCart) {
-      res.status(HttpStatus.OK).json(updatedCart);
-    } else {
-      res.status(HttpStatus.NOT_FOUND).json({
-        error: `Carrito con ID ${cid} o producto con ID ${pid} no encontrado.`,
-      });
+    if (
+      !mongoose.Types.ObjectId.isValid(cid) ||
+      !mongoose.Types.ObjectId.isValid(pid)
+    ) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ error: "ID de carrito o producto no válido" });
     }
+    if (quantity <= 0) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ error: "La cantidad debe ser un valor positivo" });
+    }
+
+    const updatedCart = await Cart.findByIdAndUpdate(
+      cid,
+      {
+        $push: { products: { product: pid, quantity } },
+      },
+      { new: true }
+    )
+      .populate("products.product")
+      .lean();
+
+    res.status(HttpStatus.OK).json(updatedCart);
   } catch (error) {
-    console.error(`Error al agregar el producto al carrito: ${error.message}`);
+    console.error("Error al agregar el producto al carrito:", error.message);
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
       .json({ error: "Error al agregar el producto al carrito" });
   }
 };
 
-// Controlador para eliminar un producto de un carrito
+// Controlador para eliminar un producto del carrito
 export const removeProductFromCart = async (req, res) => {
   const { cid, pid } = req.params;
-
   try {
-    // Convertir `cid` y `pid` a ObjectId usando `new`
-    const cartId = new mongoose.Types.ObjectId(cid);
-    const productId = new mongoose.Types.ObjectId(pid);
-
-    const cart = await Cart.findById(cartId);
-    if (!cart) {
+    if (
+      !mongoose.Types.ObjectId.isValid(cid) ||
+      !mongoose.Types.ObjectId.isValid(pid)
+    ) {
       return res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ error: `Carrito con ID ${cid} no encontrado.` });
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ error: "ID de carrito o producto no válido" });
     }
 
-    // Eliminar el producto del carrito
-    cart.products = cart.products.filter(
-      (item) => !item.product.equals(productId)
-    );
-    await cart.save();
+    const updatedCart = await Cart.findByIdAndUpdate(
+      cid,
+      {
+        $pull: { products: { product: pid } },
+      },
+      { new: true }
+    )
+      .populate("products.product")
+      .lean();
 
-    res
-      .status(HttpStatus.OK)
-      .json({ message: `Producto ${pid} eliminado del carrito ${cid}` });
+    res.status(HttpStatus.OK).json(updatedCart);
   } catch (error) {
-    console.error(
-      `Error al eliminar el producto del carrito: ${error.message}`
-    );
+    console.error("Error al eliminar el producto del carrito:", error.message);
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
       .json({ error: "Error al eliminar el producto del carrito" });
   }
 };
 
-// Función para actualizar la cantidad de un producto en un carrito
+// Controlador para actualizar la cantidad de un producto en el carrito
 export const updateProductQuantity = async (req, res) => {
   const { cid, pid } = req.params;
-  const { quantity } = req.body; // Asegúrate de enviar `quantity` en el cuerpo de la solicitud
-
+  const { quantity } = req.body;
   try {
-    const cartId = new mongoose.Types.ObjectId(cid);
-    const productId = new mongoose.Types.ObjectId(pid);
+    if (
+      !mongoose.Types.ObjectId.isValid(cid) ||
+      !mongoose.Types.ObjectId.isValid(pid)
+    ) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ error: "ID de carrito o producto no válido" });
+    }
+    if (quantity <= 0) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ error: "La cantidad debe ser un valor positivo" });
+    }
 
-    // Buscar el carrito
-    const cart = await Cart.findById(cartId);
+    const cart = await Cart.findOneAndUpdate(
+      { _id: cid, "products.product": pid },
+      { $set: { "products.$.quantity": quantity } },
+      { new: true }
+    )
+      .populate("products.product")
+      .lean();
+
     if (!cart) {
       return res
         .status(HttpStatus.NOT_FOUND)
-        .json({ error: `Carrito con ID ${cid} no encontrado.` });
+        .json({ error: "Producto o carrito no encontrado" });
     }
 
-    // Encontrar el producto en el carrito y actualizar la cantidad
-    const product = cart.products.find((item) =>
-      item.product.equals(productId)
-    );
-    if (!product) {
-      return res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ error: `Producto con ID ${pid} no encontrado en el carrito.` });
-    }
-
-    product.quantity = quantity; // Actualizar la cantidad
-    await cart.save();
-
-    res.status(HttpStatus.OK).json({
-      message: `Cantidad del producto ${pid} actualizada en el carrito ${cid}`,
-    });
+    res.status(HttpStatus.OK).json(cart);
   } catch (error) {
     console.error(
-      `Error al actualizar la cantidad del producto: ${error.message}`
+      "Error al actualizar la cantidad del producto:",
+      error.message
     );
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      error: "Error al actualizar la cantidad del producto en el carrito",
-    });
-  }
-};
-
-// Función para actualizar el carrito con un arreglo de productos
-export const updateCart = async (req, res) => {
-  const { cid } = req.params;
-  const { products } = req.body; // El nuevo arreglo de productos se pasa en el cuerpo de la solicitud
-
-  try {
-    const cartId = new mongoose.Types.ObjectId(cid);
-
-    const cart = await Cart.findById(cartId);
-    if (!cart) {
-      return res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ error: `Carrito con ID ${cid} no encontrado.` });
-    }
-
-    // Validar y actualizar los productos en el carrito
-    cart.products = products.map((item) => ({
-      product: new mongoose.Types.ObjectId(item.product),
-      quantity: item.quantity,
-    }));
-
-    await cart.save();
-
-    res
-      .status(HttpStatus.OK)
-      .json({ message: `Carrito ${cid} actualizado con los nuevos productos` });
-  } catch (error) {
-    console.error(`Error al actualizar el carrito: ${error.message}`);
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .json({ error: "Error al actualizar el carrito" });
+      .json({ error: "Error al actualizar la cantidad del producto" });
   }
 };
 
-//Elimina todos los productos de un carrito específico.
+// Controlador para vaciar el carrito
 export const clearCart = async (req, res) => {
   const { cid } = req.params;
-
   try {
-    const cartId = new mongoose.Types.ObjectId(cid);
-
-    const cart = await Cart.findById(cartId);
-    if (!cart) {
+    if (!mongoose.Types.ObjectId.isValid(cid)) {
       return res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ error: `Carrito con ID ${cid} no encontrado.` });
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ error: "ID de carrito no válido" });
     }
 
-    // Vaciar el arreglo de productos
-    cart.products = [];
-    await cart.save();
-
-    res
-      .status(HttpStatus.OK)
-      .json({ message: `Todos los productos eliminados del carrito ${cid}` });
+    const clearedCart = await Cart.findByIdAndUpdate(
+      cid,
+      { products: [] },
+      { new: true }
+    ).lean();
+    res.status(HttpStatus.OK).json(clearedCart);
   } catch (error) {
-    console.error(
-      `Error al eliminar todos los productos del carrito: ${error.message}`
-    );
+    console.error("Error al vaciar el carrito:", error.message);
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .json({ error: "Error al eliminar los productos del carrito" });
+      .json({ error: "Error al vaciar el carrito" });
   }
 };

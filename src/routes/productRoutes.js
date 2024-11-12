@@ -1,28 +1,22 @@
 // src/routes/productRoutes.js
 import { Router } from "express";
-import {
-  getProducts, // Este controlador incluirá paginación, filtros y ordenamiento
-  getProductById,
-  addProduct,
-  updateProduct,
-  deleteProduct,
-} from "../controllers/productController.js";
+import productController from "../controllers/productController.js";
 
 const router = Router();
 
 // Ruta para obtener todos los productos con paginación, filtros y ordenamiento
-router.get("/", getProducts);
+router.get("/", productController.getProducts);
 
-// Ruta para obtener un producto por ID
-router.get("/:pid", getProductById);
+// Ruta para obtener un producto por ID y renderizar la vista de detalles
+router.get("/:pid", productController.getProductById);
 
 // Ruta para agregar un nuevo producto
-router.post("/", addProduct);
+router.post("/", productController.addProduct);
 
 // Ruta para actualizar un producto existente
-router.put("/:pid", updateProduct);
+router.put("/:pid", productController.updateProduct);
 
 // Ruta para eliminar un producto por ID
-router.delete("/:pid", deleteProduct);
+router.delete("/:pid", productController.deleteProduct);
 
 export default router;

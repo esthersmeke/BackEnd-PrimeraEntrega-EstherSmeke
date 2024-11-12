@@ -1,4 +1,5 @@
 import express from "express";
+import mongoose from "mongoose";
 import productRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import { Server as HttpServer } from "http";
@@ -8,8 +9,11 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { ProductManager } from "./dao/ProductManager.js";
 import cors from "cors";
-import mongoose from "mongoose";
-import { Product } from "./models/Product.js";
+import {
+  getProducts,
+  getProductById,
+} from "./controllers/productController.js";
+import { getOrCreateCart, getCartById } from "./controllers/cartController.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -59,38 +63,17 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/products", productRoutes);
 app.use("/api/carts", cartRoutes);
 
-app.get("/products", async (req, res) => {
+// Rutas de vistas
+app.get("/products", getProducts); // Controlador para renderizar lista de productos
+app.get("/products/:pid", getProductById); // Controlador para detalles de un producto
+app.get("/carts/:cid", getCartById); // Controlador para ver un carrito específico
+app.get("/my-cart", async (req, res) => {
   try {
-    const { limit = 10, page = 1, query, sort } = req.query;
-
-    const options = {
-      limit: parseInt(limit),
-      page: parseInt(page),
-      sort: sort ? { price: sort === "asc" ? 1 : -1 } : {},
-    };
-    const filter = query
-      ? {
-          $or: [
-            { title: new RegExp(query, "i") },
-            { category: new RegExp(query, "i") },
-          ],
-        }
-      : {};
-
-    const productsData = await Product.paginate(filter, options);
-
-    res.render("home", {
-      docs: productsData.docs, // Asegurarte de que los productos están en `docs`
-      hasPrevPage: productsData.hasPrevPage,
-      hasNextPage: productsData.hasNextPage,
-      prevPage: productsData.prevPage,
-      nextPage: productsData.nextPage,
-      currentPage: productsData.page,
-      totalPages: productsData.totalPages,
-    });
+    const cart = await getOrCreateCart();
+    res.redirect(`/carts/${cart._id}`);
   } catch (error) {
-    console.error(`Error al cargar productos: ${error.message}`);
-    res.status(500).send("Error al cargar la lista de productos");
+    console.error("Error al obtener o crear el carrito:", error.message);
+    res.status(500).send("Error al obtener o crear el carrito");
   }
 });
 

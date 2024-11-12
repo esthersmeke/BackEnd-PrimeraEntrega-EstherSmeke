@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>Precio: ${product.price}</p>
           <p>Stock: ${product.stock}</p>
           <p>Categoría: ${product.category}</p>
-          <button onclick="deleteProduct('${product.id}')">Eliminar</button>
+          <button onclick="deleteProduct('${product._id}')">Eliminar</button>
         </li>
       `;
     });

@@ -2,8 +2,8 @@
 import { Product } from "../models/Product.js";
 
 export class ProductManager {
-  async getProducts() {
-    return await Product.find();
+  async getProducts(filter, options) {
+    return await Product.paginate(filter, options);
   }
 
   async getProductById(id) {

@@ -2,11 +2,14 @@
 import mongoose from "mongoose";
 
 const cartSchema = new mongoose.Schema({
-  id: { type: Number, unique: true }, // ID numérico adicional
   products: [
     {
-      product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
-      quantity: Number,
+      product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+        required: true,
+      },
+      quantity: { type: Number, required: true, default: 1 },
     },
   ],
 });

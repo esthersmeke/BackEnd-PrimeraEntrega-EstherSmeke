@@ -1,0 +1,17 @@
+<!-- views/productDetail.handlebars -->
+
+<h1>Detalles del Producto</h1>
+
+<div class="product-detail">
+  <h2>{{product.title}}</h2>
+  <p><strong>Descripción:</strong> {{product.description}}</p>
+  <p><strong>Código:</strong> {{product.code}}</p>
+  <p><strong>Precio:</strong> ${{product.price}}</p>
+  <p><strong>Categoría:</strong> {{product.category}}</p>
+  <p><strong>Stock:</strong> {{product.stock}}</p>
+  <button
+    onclick="addToCart('672fbc5353955b867845e3da', '{{product._id}}')"
+  >Agregar al carrito</button>
+</div>
+
+<script src="/js/addToCart.js"></script>
