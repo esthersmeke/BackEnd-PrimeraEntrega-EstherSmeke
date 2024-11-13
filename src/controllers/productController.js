@@ -1,23 +1,20 @@
 // src/controllers/productController.js
 
-import { Cart } from "../models/Cart.js"; // Importa el modelo del carrito
+import { Cart } from "../models/Cart.js";
 import { Product } from "../models/Product.js";
 import { HttpStatus } from "../utils/constants.js";
-import mongoose from "mongoose"; // Importa mongoose para validaciones de ID
+import mongoose from "mongoose";
 
 // Controlador para obtener todos los productos con paginación, filtros y ordenamiento
-export const getProducts = async (req, res) => {
-  // Asigna valores predeterminados si `sort` o `query` son undefined
+export const getProducts = async (req, res, next) => {
   const { limit = 10, page = 1, sort = "asc", query = "" } = req.query;
 
   try {
-    // Obtener o crear un carrito para el usuario
-    let cart = await Cart.findOne(); // Ajusta esto según la lógica de usuario
+    let cart = await Cart.findOne();
     if (!cart) {
       cart = await Cart.create({ products: [] });
     }
 
-    // Configuración de paginación y filtros
     const options = {
       limit: parseInt(limit, 10),
       page: parseInt(page, 10),
@@ -39,7 +36,7 @@ export const getProducts = async (req, res) => {
       : {};
 
     const productsData = await Product.paginate(filter, options);
-    // Ajuste para que los enlaces de paginación mantengan `sort` y `query`
+
     const baseUrl = `${req.protocol}://${req.get("host")}${req.originalUrl
       .split("?")
       .shift()}`;
@@ -50,85 +47,76 @@ export const getProducts = async (req, res) => {
       ? `${baseUrl}?page=${productsData.nextPage}&limit=${limit}&sort=${sort}&query=${query}`
       : null;
 
-    const totalDocs = productsData.totalDocs; // Total de productos en la base de datos
-    const docsCount = productsData.docs.length; // Cantidad de productos mostrados en la página actual
-
     const response = {
-      status: "success", // o "error" en caso de fallos
-      payload: productsData.docs, // resultado de los productos paginados
-      totalDocs: totalDocs, // Total de productos
-      docsCount: docsCount, // Productos mostrados en esta página
+      status: "success",
+      payload: productsData.docs,
+      totalDocs: productsData.totalDocs,
+      docsCount: productsData.docs.length,
       totalPages: productsData.totalPages,
       prevPage: productsData.prevPage,
       nextPage: productsData.nextPage,
       page: productsData.page,
       hasPrevPage: productsData.hasPrevPage,
       hasNextPage: productsData.hasNextPage,
-      prevLink: prevLink, // enlace a la página anterior, si existe
-      nextLink: nextLink, // enlace a la página siguiente, si existe
+      prevLink: prevLink,
+      nextLink: nextLink,
     };
 
     if (req.headers.accept && req.headers.accept.includes("application/json")) {
-      // Responder en JSON para solicitudes de API como en Postman
       res.json(response);
     } else {
-      // Renderizar la vista para solicitudes en el navegador
       res.render("home", response);
     }
   } catch (error) {
     console.error("Error al obtener productos:", error.message);
-    res
-      .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .json({ error: "Error al obtener productos" });
+    next(error); // Pasamos el error directamente
   }
 };
 
 // Controlador para obtener un producto por ID y renderizar la vista de detalles
-export const getProductById = async (req, res) => {
+export const getProductById = async (req, res, next) => {
   const { pid } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(pid)) {
-    return res
-      .status(HttpStatus.BAD_REQUEST)
-      .json({ error: "El ID proporcionado no es válido." });
-  }
-
   try {
+    if (!mongoose.Types.ObjectId.isValid(pid)) {
+      throw {
+        status: HttpStatus.BAD_REQUEST,
+        message: "El ID proporcionado no es válido.",
+      };
+    }
+
     const product = await Product.findById(pid).lean();
 
-    // Obtener o crear un carrito para el usuario
-    let cart = await Cart.findOne(); // Ajusta esto según la lógica de usuario
+    let cart = await Cart.findOne();
     if (!cart) {
       cart = await Cart.create({ products: [] });
     }
 
     if (product) {
-      // Verifica si la solicitud es JSON para responder en JSON (Postman) o HTML (Navegador)
       if (
         req.headers.accept &&
         req.headers.accept.includes("application/json")
       ) {
-        res.json({ product, cartId: cart._id }); // Responder en JSON para solicitudes como Postman
+        res.json({ product, cartId: cart._id });
       } else {
-        res.render("productDetail", { product, cartId: cart._id }); // Renderizar la vista en HTML para navegador
+        res.render("productDetail", { product, cartId: cart._id });
       }
     } else {
-      res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ error: `Producto con ID ${pid} no encontrado` });
+      throw {
+        status: HttpStatus.NOT_FOUND,
+        message: `Producto con ID ${pid} no encontrado`,
+      };
     }
   } catch (error) {
     console.error(
       `Error al cargar el producto con ID ${pid}: ${error.message}`
     );
-    res
-      .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .json({ error: "Error al cargar el producto" });
+    next(error); // Pasamos el error directamente
   }
 };
 
 // Controlador para agregar un nuevo producto
-export const addProduct = async (req, res) => {
+export const addProduct = async (req, res, next) => {
   const requiredFields = [
     "title",
     "description",
@@ -139,7 +127,6 @@ export const addProduct = async (req, res) => {
   ];
   const missingFields = requiredFields.filter((field) => !req.body[field]);
 
-  // Verificar si falta algún campo obligatorio
   if (missingFields.length > 0) {
     return res.status(HttpStatus.BAD_REQUEST).json({
       error: `Error al agregar el producto. El campo '${missingFields.join(
@@ -159,72 +146,70 @@ export const addProduct = async (req, res) => {
       });
     } else {
       console.error(`Error al agregar el producto: ${error.message}`);
-      res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ error: "Error al agregar el producto" });
+      next(error); // Pasamos el error directamente
     }
   }
 };
 
 // Controlador para actualizar un producto por ID
-export const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res, next) => {
   const { pid } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(pid)) {
-    return res
-      .status(HttpStatus.BAD_REQUEST)
-      .json({ error: "El ID proporcionado no es válido." });
-  }
-
   try {
+    if (!mongoose.Types.ObjectId.isValid(pid)) {
+      throw {
+        status: HttpStatus.BAD_REQUEST,
+        message: "El ID proporcionado no es válido.",
+      };
+    }
+
     const updatedProduct = await Product.findByIdAndUpdate(pid, req.body, {
       new: true,
     });
     if (updatedProduct) {
       res.status(HttpStatus.OK).json(updatedProduct);
     } else {
-      res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ error: `Producto con ID ${pid} no encontrado.` });
+      throw {
+        status: HttpStatus.NOT_FOUND,
+        message: `Producto con ID ${pid} no encontrado.`,
+      };
     }
   } catch (error) {
     console.error(
       `Error al actualizar el producto con ID ${pid}: ${error.message}`
     );
-    res
-      .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .json({ error: "Error interno al actualizar el producto" });
+    next(error); // Pasamos el error directamente
   }
 };
 
 // Controlador para eliminar un producto por ID
-export const deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res, next) => {
   const { pid } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(pid)) {
-    return res
-      .status(HttpStatus.BAD_REQUEST)
-      .json({ error: "El ID proporcionado no es válido." });
-  }
-
   try {
+    if (!mongoose.Types.ObjectId.isValid(pid)) {
+      throw {
+        status: HttpStatus.BAD_REQUEST,
+        message: "El ID proporcionado no es válido.",
+      };
+    }
+
     const deletedProduct = await Product.findByIdAndDelete(pid);
     if (deletedProduct) {
       res
         .status(HttpStatus.OK)
         .json({ message: "Producto eliminado correctamente" });
     } else {
-      res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ error: `Producto con ID ${pid} no encontrado.` });
+      throw {
+        status: HttpStatus.NOT_FOUND,
+        message: `Producto con ID ${pid} no encontrado.`,
+      };
     }
   } catch (error) {
     console.error(
       `Error al eliminar el producto con ID ${pid}: ${error.message}`
     );
-    res
-      .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .json({ error: "Error interno al eliminar el producto" });
+    next(error); // Pasamos el error directamente
   }
 };
 

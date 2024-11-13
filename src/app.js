@@ -16,6 +16,7 @@ import {
 } from "./controllers/productController.js";
 import { getOrCreateCart, getCartById } from "./controllers/cartController.js";
 import { configureSocket } from "./sockets/configureSocket.js"; // Importamos el archivo de configuración de sockets
+import { errorHandler } from "./utils/errorHandler.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -66,7 +67,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/products", productRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/", vistasRouter);
-
 // Rutas de vistas
 app.get("/products", getProducts); // Controlador para renderizar lista de productos
 app.get("/products/:pid", getProductById); // Controlador para detalles de un producto
@@ -80,6 +80,9 @@ app.get("/my-cart", async (req, res) => {
     res.status(500).send("Error al obtener o crear el carrito");
   }
 });
+
+// Middleware de manejo de errores
+app.use(errorHandler);
 
 // Configuración de WebSocket usando configureSocket
 configureSocket(io, productManager);
