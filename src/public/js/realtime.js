@@ -1,5 +1,7 @@
 // public/js/realtime.js
+
 document.addEventListener("DOMContentLoaded", () => {
+  // Establecer conexión con el servidor usando WebSocket
   const socket = io({
     transports: ["websocket"], // Fuerza el uso de WebSocket solamente
   });
@@ -7,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const productContainer = document.getElementById("products");
   const productForm = document.getElementById("productForm");
 
-  // Escuchar el evento 'updateProducts' y asegurarnos de que recibimos solo el array
+  // Escuchar el evento 'updateProducts' para actualizar la lista de productos
   socket.on("updateProducts", (products) => {
     console.log("Productos recibidos en el cliente:", products);
 
@@ -31,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Manejar el envío del formulario para agregar un nuevo producto
   productForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const newProduct = {
@@ -41,14 +44,16 @@ document.addEventListener("DOMContentLoaded", () => {
       stock: parseInt(document.getElementById("stock").value),
       category: document.getElementById("category").value,
     };
-    socket.emit("addProduct", newProduct);
-    productForm.reset();
+    socket.emit("addProduct", newProduct); // Emitir evento para agregar producto
+    productForm.reset(); // Limpiar el formulario después de enviarlo
   });
 
+  // Función para eliminar un producto específico
   window.deleteProduct = (productId) => {
     socket.emit("deleteProduct", productId);
   };
 
+  // Escuchar el evento de error de producto y mostrar una alerta
   socket.on("productError", (error) => {
     alert(error.message);
   });

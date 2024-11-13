@@ -15,7 +15,7 @@ import {
   getProductById,
 } from "./controllers/productController.js";
 import { getOrCreateCart, getCartById } from "./controllers/cartController.js";
-import { configureSocket } from "./sockets/configureSocket.js"; // Importamos el archivo de configuración de sockets
+import { configureSocket } from "./sockets/configureSocket.js"; // Configuración de sockets
 import { errorHandler } from "./utils/errorHandler.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -40,12 +40,12 @@ mongoose
 
 const productManager = new ProductManager();
 
-// Middlewares
+// Middlewares de configuración
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-// Configuración de Handlebars
+// Configuración de Handlebars como motor de vistas
 app.engine(
   "handlebars",
   engine({
@@ -60,17 +60,18 @@ app.engine(
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "views"));
 
-// Servir archivos estáticos
+// Servir archivos estáticos desde la carpeta "public"
 app.use(express.static(path.join(__dirname, "public")));
 
-// Rutas de productos y carritos
+// Configuración de rutas para productos y carritos
 app.use("/api/products", productRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/", vistasRouter);
+
 // Rutas de vistas
-app.get("/products", getProducts); // Controlador para renderizar lista de productos
-app.get("/products/:pid", getProductById); // Controlador para detalles de un producto
-app.get("/carts/:cid", getCartById); // Controlador para ver un carrito específico
+app.get("/products", getProducts); // Renderizar lista de productos
+app.get("/products/:pid", getProductById); // Detalles de un producto
+app.get("/carts/:cid", getCartById); // Ver un carrito específico
 app.get("/my-cart", async (req, res) => {
   try {
     const cart = await getOrCreateCart();
@@ -84,10 +85,10 @@ app.get("/my-cart", async (req, res) => {
 // Middleware de manejo de errores
 app.use(errorHandler);
 
-// Configuración de WebSocket usando configureSocket
+// Configuración de WebSocket usando el archivo de configuración de sockets
 configureSocket(io, productManager);
 
-// Iniciar el servidor
+// Iniciar el servidor en el puerto especificado
 const PORT = 8080;
 httpServer.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);

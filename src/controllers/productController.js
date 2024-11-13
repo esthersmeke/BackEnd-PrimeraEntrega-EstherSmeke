@@ -5,7 +5,7 @@ import { Product } from "../models/Product.js";
 import { HttpStatus } from "../utils/constants.js";
 import mongoose from "mongoose";
 
-// Controlador para obtener todos los productos con paginación, filtros y ordenamiento
+// Obtener todos los productos con paginación, filtros y ordenamiento
 export const getProducts = async (req, res, next) => {
   const { limit = 10, page = 1, sort = "asc", query = "" } = req.query;
 
@@ -69,11 +69,11 @@ export const getProducts = async (req, res, next) => {
     }
   } catch (error) {
     console.error("Error al obtener productos:", error.message);
-    next(error); // Pasamos el error directamente
+    next(error);
   }
 };
 
-// Controlador para obtener un producto por ID y renderizar la vista de detalles
+// Obtener un producto por ID y renderizar la vista de detalles
 export const getProductById = async (req, res, next) => {
   const { pid } = req.params;
 
@@ -111,11 +111,11 @@ export const getProductById = async (req, res, next) => {
     console.error(
       `Error al cargar el producto con ID ${pid}: ${error.message}`
     );
-    next(error); // Pasamos el error directamente
+    next(error);
   }
 };
 
-// Controlador para agregar un nuevo producto
+// Agregar un nuevo producto
 export const addProduct = async (req, res, next) => {
   const requiredFields = [
     "title",
@@ -146,12 +146,12 @@ export const addProduct = async (req, res, next) => {
       });
     } else {
       console.error(`Error al agregar el producto: ${error.message}`);
-      next(error); // Pasamos el error directamente
+      next(error);
     }
   }
 };
 
-// Controlador para actualizar un producto por ID
+// Actualizar un producto por ID
 export const updateProduct = async (req, res, next) => {
   const { pid } = req.params;
 
@@ -178,11 +178,11 @@ export const updateProduct = async (req, res, next) => {
     console.error(
       `Error al actualizar el producto con ID ${pid}: ${error.message}`
     );
-    next(error); // Pasamos el error directamente
+    next(error);
   }
 };
 
-// Controlador para eliminar un producto por ID
+// Eliminar un producto por ID
 export const deleteProduct = async (req, res, next) => {
   const { pid } = req.params;
 
@@ -209,7 +209,7 @@ export const deleteProduct = async (req, res, next) => {
     console.error(
       `Error al eliminar el producto con ID ${pid}: ${error.message}`
     );
-    next(error); // Pasamos el error directamente
+    next(error);
   }
 };
 

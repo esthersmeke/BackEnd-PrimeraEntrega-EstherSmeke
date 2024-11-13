@@ -1,4 +1,5 @@
 function addToCart(cartId, productId) {
+  // Validar que productId no esté indefinido
   if (!productId) {
     console.error("Error: El productId es undefined.");
     alert(
@@ -7,6 +8,7 @@ function addToCart(cartId, productId) {
     return;
   }
 
+  // Realizar la solicitud para agregar el producto al carrito
   fetch(`/api/carts/${cartId}/products/${productId}`, {
     method: "POST",
     headers: {
@@ -15,6 +17,7 @@ function addToCart(cartId, productId) {
     body: JSON.stringify({ quantity: 1 }),
   })
     .then((response) => {
+      // Verificar si la respuesta es exitosa
       if (!response.ok) {
         throw new Error("Error al agregar el producto al carrito");
       }
