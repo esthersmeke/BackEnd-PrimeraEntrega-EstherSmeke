@@ -119,6 +119,48 @@ export const addProductToCart = async (req, res, next) => {
   }
 };
 
+// Actualizar todos los productos en un carrito
+export const updateCartProducts = async (req, res, next) => {
+  const { cid } = req.params; // ID del carrito
+  const { products } = req.body; // Lista de nuevos productos
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(cid)) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        error: "El ID proporcionado no es válido.",
+      });
+    }
+
+    if (!Array.isArray(products)) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        error: "El cuerpo de la solicitud debe contener un array de productos.",
+      });
+    }
+
+    const cart = await Cart.findById(cid);
+    if (!cart) {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        error: `Carrito con ID ${cid} no encontrado.`,
+      });
+    }
+
+    // Actualizar los productos del carrito
+    cart.products = products;
+    await cart.save();
+
+    res.status(HttpStatus.OK).json({
+      message: "Carrito actualizado correctamente.",
+      cart,
+    });
+  } catch (error) {
+    console.error(
+      "Error al actualizar todos los productos del carrito:",
+      error.message
+    );
+    next(error);
+  }
+};
+
 // Eliminar un producto del carrito
 export const removeProductFromCart = async (req, res, next) => {
   const { cid, pid } = req.params;

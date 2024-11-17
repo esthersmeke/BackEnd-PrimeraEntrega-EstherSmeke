@@ -20,6 +20,9 @@ router.post("/:cid/products/:pid", cartController.addProductToCart);
 // Ruta para eliminar un producto de un carrito específico
 router.delete("/:cid/products/:pid", cartController.removeProductFromCart);
 
+// Ruta para actualizar todos los productos en un carrito
+router.put("/:cid", cartController.updateCartProducts);
+
 // Ruta para actualizar la cantidad de un producto en un carrito específico
 router.put("/:cid/products/:pid", cartController.updateProductQuantity);
 
