@@ -101,44 +101,14 @@ Se utiliza Handlebars para renderizar vistas en el servidor. Las vistas incluyen
 ├── package.json # Información del proyecto y dependencias
 ├── package-lock.json # Control de versiones de dependencias
 └── README.md # Documentación del proyecto
-📦ecommerce-backend
-┣ 📂src
-┃ ┣ 📂controllers
-┃ ┃ ┣ 📜cartController.js # Lógica de negocio para productos
-┃ ┃ ┗ 📜productController.js # Lógica de negocio para productos
-┃ ┣ 📂dao
-┃ ┃ ┣ 📜CartManager.js # Clase para manejo de carritos
-┃ ┃ ┣ 📜MessageManager.js # Clase para manejo de mensajes
-┃ ┃ ┗ 📜ProductManager.js # Clase para manejo de productos
-┃ ┣ 📂models
-┃ ┃ ┣ 📜Cart.js # Modelo de carrito
-┃ ┃ ┣ 📜Message.js # Modelo para mensajes
-┃ ┃ ┗ 📜Product.js # Modelo de producto
-┃ ┣ 📂public
-┃ ┃ ┣ 📂js
-┃ ┃ ┃ ┣ 📜cartActions.js # Lógica de cliente para acciones del carrito
-┃ ┃ ┃ ┗ 📜realtime.js # Lógica de cliente para WebSockets
-┃ ┃ ┣ 📜index.html
-┃ ┃ ┗ 📜styles.css
-┃ ┣ 📂routes
-┃ ┃ ┣ 📜cartRoutes.js # Rutas para carritos
-┃ ┃ ┣ 📜productRoutes.js # Rutas para productos
-┃ ┃ ┗ 📜vistasRouter.js # Rutas para vistas
-┃ ┣ 📂sockets
-┃ ┃ ┗ 📜configureSocket.js # Configuración del servidor WebSocket
-┃ ┣ 📂utils
-┃ ┃ ┣ 📜constants.js # Constantes globales
-┃ ┃ ┗ 📜errorHandler.js # Middleware para manejo de errores
-┃ ┣ 📂views
-┃ ┃ ┣ 📂layouts
-┃ ┃ ┃ ┗ 📜main.handlebars # Layout principal
-┃ ┃ ┣ 📜cart.handlebars # Vista para carrito
-┃ ┃ ┣ 📜error.handlebars # Vista para errores
-┃ ┃ ┣ 📜home.handlebars # Vista para listar productos
-┃ ┃ ┣ 📜productDetail.handlebars # Vista para detalles de producto
-┃ ┃ ┗ 📜realTimeProducts.handlebars # Vista para productos en tiempo real
-┃ ┗ 📜app.js
-┣ 📜.gitignore
-┣ 📜README.md
-┣ 📜package-lock.json
-┗ 📜package.json
+
+Entendido, lo quieres idéntico, con el mismo estilo y alineación que tienes en tu ejemplo. Aquí está el formato exacto que necesitas para que se vea así en tu README.md en GitHub:
+
+markdown
+Copiar código
+
+# E-commerce Backend Project
+
+## Estructura del Proyecto
+
+📦ecommerce-backend ┣ 📂src ┃ ┣ 📂controllers ┃ ┃ ┣ 📜cartController.js # Lógica de negocio para productos ┃ ┃ ┗ 📜productController.js # Lógica de negocio para productos ┃ ┣ 📂dao ┃ ┃ ┣ 📜CartManager.js # Clase para manejo de carritos ┃ ┃ ┣ 📜MessageManager.js # Clase para manejo de mensajes ┃ ┃ ┗ 📜ProductManager.js # Clase para manejo de productos ┃ ┣ 📂models ┃ ┃ ┣ 📜Cart.js # Modelo de carrito ┃ ┃ ┣ 📜Message.js # Modelo para mensajes ┃ ┃ ┗ 📜Product.js # Modelo de producto ┃ ┣ 📂public ┃ ┃ ┣ 📂js ┃ ┃ ┃ ┣ 📜cartActions.js # Lógica de cliente para acciones del carrito ┃ ┃ ┃ ┗ 📜realtime.js # Lógica de cliente para WebSockets ┃ ┃ ┣ 📜index.html ┃ ┃ ┗ 📜styles.css ┃ ┣ 📂routes ┃ ┃ ┣ 📜cartRoutes.js # Rutas para carritos ┃ ┃ ┣ 📜productRoutes.js # Rutas para productos ┃ ┃ ┗ 📜vistasRouter.js # Rutas para vistas ┃ ┣ 📂sockets ┃ ┃ ┗ 📜configureSocket.js # Configuración del servidor WebSocket ┃ ┣ 📂utils ┃ ┃ ┣ 📜constants.js # Constantes globales ┃ ┃ ┗ 📜errorHandler.js # Middleware para manejo de errores ┃ ┣ 📂views ┃ ┃ ┣ 📂layouts ┃ ┃ ┃ ┗ 📜main.handlebars # Layout principal ┃ ┃ ┣ 📜cart.handlebars # Vista para carrito ┃ ┃ ┣ 📜error.handlebars # Vista para errores ┃ ┃ ┣ 📜home.handlebars # Vista para listar productos ┃ ┃ ┣ 📜productDetail.handlebars # Vista para detalles de producto ┃ ┃ ┗ 📜realTimeProducts.handlebars # Vista para productos en tiempo real ┃ ┗ 📜app.js ┣ 📜.gitignore ┣ 📜README.md ┣ 📜package-lock.json ┗ 📜package.json
