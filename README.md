@@ -63,7 +63,7 @@ Se utiliza Handlebars para renderizar vistas en el servidor. Las vistas disponib
 - **Detalle de Producto (`/products/:pid`)**:  
   Página con los detalles de un producto específico, que incluye un botón para regresar a la lista de productos y la opción de agregar el producto al carrito.
 
-- **Carrito (`/cart`)**:  
+- **Carrito (`/cart/:cid`)**:  
   Visualización de los productos en un carrito específico, con opciones para actualizar cantidades, eliminar productos, o vaciar el carrito.
 
 - **Productos en Tiempo Real (`/realtimeproducts`)**:  
