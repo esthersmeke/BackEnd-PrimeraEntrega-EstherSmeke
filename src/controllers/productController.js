@@ -26,7 +26,9 @@ export const getProducts = async (req, res, next) => {
           : undefined,
       lean: true,
     };
-    const filter = query
+
+    // Construir filtro dinámico
+    let filter = query
       ? {
           $or: [
             { title: new RegExp(query, "i") },
@@ -34,6 +36,12 @@ export const getProducts = async (req, res, next) => {
           ],
         }
       : {};
+
+    // Agregar filtro para `status`
+    if (query.startsWith("status:")) {
+      const statusValue = query.split(":")[1];
+      filter = { status: statusValue === "true" }; // Convertir a booleano
+    }
 
     const productsData = await Product.paginate(filter, options);
 

@@ -10,13 +10,26 @@ Este es el backend de una aplicación de ecommerce desarrollada con Node.js, Exp
 - **Mongoose**: ODM para interactuar con MongoDB.
 - **WebSocket**: Comunicación en tiempo real con los clientes.
 - **Handlebars**: Motor de plantillas para renderizar vistas en el servidor.
-- **Cors**: Middleware para permitir solicitudes desde diferentes dominios.
+- **Cors**: Middleware para permitir solicitudes desde diferentes dominios, útil en aplicaciones frontend-backend separadas.
 
 ## Endpoints
 
 ### Productos
 
 - **GET /api/products**: Obtener todos los productos con paginación, filtros y ordenamiento.
+
+  - **Parámetros de consulta (query params):**
+    - `limit`: Límite de productos por página (por defecto: 10).
+    - `page`: Número de página (por defecto: 1).
+    - `sort`: Ordenar por precio (`asc` para ascendente o `desc` para descendente).
+    - `query`: Buscar productos por:
+      - `title` o `category` (busca coincidencias parciales).
+      - **`status:true`** para filtrar productos disponibles (activos).
+  - **Ejemplo de uso:**
+    ```
+    GET /api/products?limit=5&page=1&sort=asc&query=status:true
+    ```
+
 - **GET /api/products/:pid**: Obtener un producto específico por su ID.
 - **POST /api/products**: Agregar un nuevo producto.
 - **PUT /api/products/:pid**: Actualizar un producto por su ID.
@@ -38,7 +51,7 @@ Este proyecto usa WebSocket para manejar actualizaciones en tiempo real de la li
 
 ## Manejo de Errores
 
-El middleware de manejo de errores se encarga de capturar errores y enviar respuestas estandarizadas en JSON al cliente, con mensajes personalizados para cada caso.
+El Middleware de manejo de errores captura excepciones tanto del backend como de la lógica del servidor, asegurando que las respuestas sean estandarizadas en formato JSON, con mensajes personalizados para cada caso (como errores de validación o problemas de conectividad).
 
 ## Vistas
 
@@ -54,8 +67,8 @@ Se utiliza Handlebars para renderizar vistas en el servidor. Las vistas incluyen
 📦ecommerce-backend
 ┣ 📂src
 ┃ ┣ 📂controllers
-┃ ┃ ┣ 📜cartController.js # Lógica de negocio para productos
-┃ ┃ ┗ 📜productController.js # Lógica de negocio para productos
+┃ ┃ ┣ 📜cartController.js # Lógica para carritos de compras
+┃ ┃ ┗ 📜productController.js # Lógica para manejo de productos
 ┃ ┣ 📂dao
 ┃ ┃ ┣ 📜CartManager.js # Clase para manejo de carritos
 ┃ ┃ ┣ 📜MessageManager.js # Clase para manejo de mensajes
