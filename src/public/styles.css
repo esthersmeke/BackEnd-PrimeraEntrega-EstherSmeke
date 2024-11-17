@@ -17,3 +17,13 @@ li {
   background-color: #f9f9f9; /* Color de fondo para los
 productos */
 }
+.button-container {
+  display: flex;
+  gap: 10px; /* Espaciado entre los botones */
+}
+
+.button-container button {
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+}

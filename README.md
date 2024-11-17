@@ -55,11 +55,19 @@ El Middleware de manejo de errores captura excepciones tanto del backend como de
 
 ## Vistas
 
-Se utiliza Handlebars para renderizar vistas en el servidor. Las vistas incluyen:
+Se utiliza Handlebars para renderizar vistas en el servidor. Las vistas disponibles son:
 
-- **Home**: Muestra la lista de productos.
-- **Detalle de Producto**: Página con los detalles de un producto específico.
-- **Carrito**: Visualización de los productos en un carrito específico.
+- **Lista de Productos (Home) (`/products`)**:  
+  Muestra la lista completa de productos con opciones para buscar, filtrar por categoría, y ordenar por precio.
+
+- **Detalle de Producto (`/products/:pid`)**:  
+  Página con los detalles de un producto específico, que incluye un botón para regresar a la lista de productos y la opción de agregar el producto al carrito.
+
+- **Carrito (`/cart`)**:  
+  Visualización de los productos en un carrito específico, con opciones para actualizar cantidades, eliminar productos, o vaciar el carrito.
+
+- **Productos en Tiempo Real (`/realtimeproducts`)**:  
+  Página interactiva que muestra una lista actualizada en tiempo real de productos mediante WebSockets.
 
 ## Estructura del Proyecto
 

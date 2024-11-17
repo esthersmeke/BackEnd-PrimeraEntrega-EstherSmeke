@@ -9,9 +9,14 @@
   <p><strong>Precio:</strong> ${{product.price}}</p>
   <p><strong>Categoría:</strong> {{product.category}}</p>
   <p><strong>Stock:</strong> {{product.stock}}</p>
+ <!-- Contenedor para los botones -->
+<div class="button-container">
   <button
     onclick="addToCart('672fbc5353955b867845e3da', '{{product._id}}')"
   >Agregar al carrito</button>
-</div>
 
-<script src="/js/addToCart.js"></script>
+  <a href="/products">
+    <button>Volver a productos</button>
+  </a>
+</div>
+<script src="/js/cartActions.js"></script>
